@@ -1,7 +1,10 @@
 name: CI
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 env:
   # プロジェクトで使用するNode.jsバージョン。EOLに達したら更新する。
