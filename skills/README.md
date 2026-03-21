@@ -1,13 +1,13 @@
 # Skills
 
-共通スキル一覧。各プロジェクトからシンボリックリンクで参照される。
+Shared skills referenced via symlinks from each project.
 
-| スキル | コマンド | 説明 |
+| Skill | Command | Description |
 |---|---|---|
-| `config-claude-sync` | `/config-claude-sync` | `.claude/`配下（rules, skills）の差分検出・シンボリックリンク同期 |
-| `config-github-sync` | `/config-github-sync` | `.github/`配下（ISSUE_TEMPLATE, workflows）の差分検出・コピー同期 |
-| `git-branch-cleanup` | `/git-branch-cleanup` | ローカルブランチクリーンアップ（main切替・ブランチ削除・pull） |
-| `git-issue-create` | `/git-issue-create` | 会話の文脈からIssue作成（タイトル・本文・ラベル推定・プレビュー） |
-| `git-issue-start` | `/git-issue-start <Issue#>` | Issue取得・ラベル検証・ブランチ作成・Plan Mode移行 |
-| `git-pr-create` | `/git-pr-create` | Issue特定・規模チェック・差分分析・PR作成 |
-| `git-review-respond` | `/git-review-respond <PR#>` | レビューコメント分析・コード修正・返信 |
+| `config-claude-sync` | `/config-claude-sync` | Detect missing symlinks and sync rules/skills under `.claude/` |
+| `config-github-sync` | `/config-github-sync` | Detect diffs and copy-sync ISSUE_TEMPLATE/workflows under `.github/` |
+| `git-branch-cleanup` | `/git-branch-cleanup` | Local branch cleanup (switch to main, delete branches, pull) |
+| `git-issue-create` | `/git-issue-create` | Create Issue from conversation context (title, body, label inference, preview) |
+| `git-issue-start` | `/git-issue-start <Issue#>` | Fetch Issue, validate labels, create branch, enter Plan Mode |
+| `git-pr-create` | `/git-pr-create` | Identify Issue, check size limits, analyze diff, create PR |
+| `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
