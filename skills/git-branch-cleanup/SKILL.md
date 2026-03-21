@@ -5,53 +5,53 @@ description: Clean up local branches - switch to main, delete all local branches
 
 # Branch Cleanup Skill
 
-PR作成・マージ後のローカルブランチクリーンアップを自動化する。mainへの切り替え・ローカルブランチ削除・最新取得を一連の流れで行う。
+Automate local branch cleanup after PR creation/merge. Switch to main, delete local branches, and pull latest in a single flow.
 
-## 実行方針
+## Execution Policy
 
-このスキルはユーザーが明示的に `/git-branch-cleanup` を実行した時点で全操作が承認済みである。以下を厳守すること:
+All operations are pre-approved when the user explicitly runs `/git-branch-cleanup`. Strictly follow these rules:
 
-- **全操作を1つのBash tool callのコマンドチェーンで実行する。Bash tool callを分割してはならない**
-- `git checkout main`, `git branch -D`, `git pull` はすべて事前承認済みの操作として扱う
-- ステップ間で「実行してよいですか？」「続行しますか？」等の質問を挟まない
-- エラーが発生した場合のみ停止する
+- **Execute all operations in a single Bash tool call command chain. Never split into multiple Bash tool calls**
+- Treat `git checkout main`, `git branch -D`, and `git pull` as pre-approved operations
+- Do not insert confirmation prompts like "Proceed?" or "Continue?" between steps
+- Stop only when an error occurs
 
-## 実行コマンド
+## Execution Command
 
-以下のコマンドチェーンを**1つのBash tool call**でそのまま実行する:
+Execute the following command chain as-is in **a single Bash tool call**:
 
 ```bash
 set -e; STATUS=$(git status --porcelain); [ -n "$STATUS" ] && echo "エラー: 未コミットの変更があります。" && exit 1; git checkout main 2>&1; git branch | grep -v '^\*' | xargs -r git branch -D 2>&1; git pull 2>&1
 ```
 
-## 処理手順（参考）
+## Steps (Reference)
 
-### Step 1: 前提条件の確認
+### Step 1: Check Prerequisites
 
-1. `git status --porcelain` で未コミット変更を確認する
-   - 変更がある場合 → エラーを表示して終了する
-2. `git branch --show-current` で現在のブランチを取得する
-   - 既に `main` の場合 → ブランチ切り替え（Step 2）をスキップする
+1. Check for uncommitted changes with `git status --porcelain`
+   - If changes exist → display error and exit
+2. Get current branch with `git branch --show-current`
+   - If already on `main` → skip branch switch (Step 2)
 
-### Step 2: mainブランチへ切り替え
+### Step 2: Switch to main Branch
 
-1. `git checkout main` を実行する
-2. 失敗した場合はエラーを表示して終了する
+1. Run `git checkout main`
+2. If it fails, display error and exit
 
-### Step 3: ローカルブランチの削除
+### Step 3: Delete Local Branches
 
-1. `git branch` でmain以外のローカルブランチ一覧を取得する
-   - ブランチがない場合 → 「削除対象のブランチはありません」と表示してStep 4へ進む
-2. 各ブランチを `git branch -D <ブランチ名>` で削除する
+1. Get list of local branches other than main with `git branch`
+   - If no branches exist → display "No branches to delete" and proceed to Step 4
+2. Delete each branch with `git branch -D <branch-name>`
 
-### Step 4: 最新取得
+### Step 4: Pull Latest
 
-1. `git pull` を実行する
-2. 失敗した場合はエラーを表示する
+1. Run `git pull`
+2. If it fails, display error
 
-### Step 5: 結果表示
+### Step 5: Display Results
 
-完了結果を以下の形式で表示する:
+Display results in the following format:
 
 ```
 ## ブランチクリーンアップ完了

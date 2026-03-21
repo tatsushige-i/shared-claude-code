@@ -5,40 +5,40 @@ description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-r
 
 # GitHub Config Sync Skill
 
-shared-claude-rulesリポジトリの `.github/` 配下の共有資材（ISSUE_TEMPLATE、workflows）を現在のプロジェクトにコピーベースで同期する。GitHubがシンボリックリンクを認識しないため、ファイルコピーで同期する。
+Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-claude-rules repository to the current project using file copies. File copies are used because GitHub does not recognize symlinks.
 
-## 処理手順
+## Steps
 
-### Step 1: 共通リポジトリの特定
+### Step 1: Locate the Shared Repository
 
-1. `.claude/rules/shared/` および `.claude/skills/` 配下のシンボリックリンクを探索する
-2. 見つかったシンボリックリンクの `readlink` 結果からshared-claude-rulesリポジトリのパスを解決する
-   - ルールのリンク例: `../../../shared-claude-rules/rules/conventions.md` → `shared-claude-rules` のパスを抽出
-   - スキルのリンク例: `../../shared-claude-rules/skills/git-pr-create` → `shared-claude-rules` のパスを抽出
-3. シンボリックリンクが1つも見つからない場合 → エラーを表示して終了する:
+1. Search for symlinks under `.claude/rules/shared/` and `.claude/skills/`
+2. Resolve the shared-claude-rules repository path from the `readlink` result of found symlinks
+   - Rule link example: `../../../shared-claude-rules/rules/conventions.md` → extract `shared-claude-rules` path
+   - Skill link example: `../../shared-claude-rules/skills/git-pr-create` → extract `shared-claude-rules` path
+3. If no symlinks are found → display error and exit:
    ```
    エラー: shared-claude-rulesへのシンボリックリンクが見つかりません。
    最初のセットアップはREADMEの手順に従って手動で行ってください。
    ```
-4. 解決したパスに `.github/` ディレクトリが存在することを検証する
-   - 存在しない場合 → エラーを表示して終了する
+4. Verify that the `.github/` directory exists at the resolved path
+   - If it does not exist → display error and exit
 
-### Step 2: 差分の検出
+### Step 2: Detect Differences
 
-1. shared側の `.github/ISSUE_TEMPLATE/` と `.github/workflows/` を走査する
-2. ローカルの対応ファイルと比較し、各ファイルの状態を判定する:
-   - **同一**: 内容が一致（`diff -q` で判定）
-   - **差分あり**: 両方に存在するが内容が異なる
-   - **新規**: shared側にあるがローカルに存在しない
-   - **ローカルのみ**: ローカルにあるがshared側に存在しない（警告表示のみ、削除はしない）
+1. Scan `.github/ISSUE_TEMPLATE/` and `.github/workflows/` on the shared side
+2. Compare with the corresponding local files and determine each file's status:
+   - **Identical**: contents match (determined by `diff -q`)
+   - **Differs**: exists on both sides but contents differ
+   - **New**: exists on the shared side but not locally
+   - **Local only**: exists locally but not on the shared side (display warning only, do not delete)
 
-### Step 3: 差分の提示・ユーザー確認
+### Step 3: Present Differences and Confirm with User
 
-1. すべて同一の場合 → 以下を表示して終了する:
+1. If all files are identical → display the following and exit:
    ```
    .github/ 配下のファイルはすべて同期済みです。
    ```
-2. 差分がある場合、カテゴリ別に状態を一覧表示する:
+2. If differences exist, display status by category:
    ```
    ## .github 同期チェック
 
@@ -53,21 +53,21 @@ shared-claude-rulesリポジトリの `.github/` 配下の共有資材（ISSUE_T
    同期する項目を選択してください（例: 全て / ISSUE_TEMPLATEのみ）。
    差分の詳細を確認したい場合はお知らせください。
    ```
-3. ユーザーが差分詳細を要求した場合 → `diff` 出力を表示する
-4. ユーザーの回答に応じて同期対象を決定する:
-   - 全承認 → 全項目を同期する
-   - 一部除外を指示 → 指示されたものを除外して同期する
+3. If the user requests diff details → show the `diff` output
+4. Determine sync targets based on the user's response:
+   - Full approval → sync all items
+   - Partial exclusion → exclude the specified items and sync the rest
 
-### Step 4: ファイルコピー
+### Step 4: Copy Files
 
-1. `.github/ISSUE_TEMPLATE/` や `.github/workflows/` ディレクトリが存在しない場合は `mkdir -p` で作成する
-2. 選択された項目を `cp` で上書きコピーする
-3. コピー後、`diff -q` で内容が一致することを検証する
-   - 不一致の場合 → エラーを表示する
+1. Create `.github/ISSUE_TEMPLATE/` and `.github/workflows/` directories with `mkdir -p` if they do not exist
+2. Overwrite-copy selected items with `cp`
+3. After copying, verify contents match with `diff -q`
+   - If mismatch → display error
 
-### Step 5: 結果表示
+### Step 5: Display Results
 
-同期結果を以下の形式で表示する:
+Display sync results in the following format:
 
 ```
 ## 同期完了
