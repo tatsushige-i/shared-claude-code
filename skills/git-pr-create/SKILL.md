@@ -5,84 +5,84 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 # Create PR Skill
 
-現在のブランチからGitHub PRを作成するワークフローを自動化する。対応Issue特定・PR規模チェック・差分分析・PR作成を一連の流れで行う。
+Automate the workflow for creating a GitHub PR from the current branch. Performs Issue identification, PR size checking, diff analysis, and PR creation in a single flow.
 
-## 処理手順
+## Steps
 
-### Step 1: 前提条件の確認
+### Step 1: Check Prerequisites
 
-1. `git branch --show-current` で現在のブランチを取得する
-   - `main` の場合 → 「エラー: mainブランチ上ではPRを作成できません。作業ブランチに切り替えてください。」と表示して終了
-2. `gh pr list --head <ブランチ名> --json number,url,state` で既存PRを確認する
-   - `OPEN` 状態のPRが存在する場合 → 「エラー: このブランチには既にオープンなPRがあります: <URL>」と表示して終了
-3. `git status --porcelain` で未コミット変更を確認する
-   - 変更がある場合 → 変更内容を分析し、関連ファイルを個別に `git add <ファイルパス>` でステージし、適切なコミットメッセージを生成して `git commit` する（`git add -A` や `git add .` は使わない。未追跡ファイルは変更内容との関連性を判断し、無関係なものは除外する）
-4. `git log main..HEAD --oneline` でコミットの存在を確認する
-   - コミットがない場合 → 「エラー: mainブランチからのコミットがありません。」と表示して終了
-5. リモートにブランチをプッシュする:
-   - `git push -u origin <ブランチ名>` を実行
-   - 失敗した場合はエラーを表示して終了
+1. Get the current branch with `git branch --show-current`
+   - If on `main` → display "エラー: mainブランチ上ではPRを作成できません。作業ブランチに切り替えてください。" and exit
+2. Check for existing PRs with `gh pr list --head <branch name> --json number,url,state`
+   - If an `OPEN` PR exists → display "エラー: このブランチには既にオープンなPRがあります: <URL>" and exit
+3. Check for uncommitted changes with `git status --porcelain`
+   - If changes exist → analyze the changes, stage related files individually with `git add <file path>`, generate an appropriate commit message and `git commit` (do not use `git add -A` or `git add .`; for untracked files, judge relevance to the changes and exclude unrelated ones)
+4. Verify commits exist with `git log main..HEAD --oneline`
+   - If no commits → display "エラー: mainブランチからのコミットがありません。" and exit
+5. Push the branch to remote:
+   - Run `git push -u origin <branch name>`
+   - If it fails, display the error and exit
 
-### Step 2: 対応Issue特定
+### Step 2: Identify Related Issue
 
-以下の順序でIssueを探索し、自動で特定する（ユーザーへの質問は行わない）:
+Search for the Issue automatically in the following order (do not ask the user):
 
-1. `git log main..HEAD --format=%s%n%b` からコミットメッセージを取得し、`#(\d+)` パターンでIssue番号を探す
-2. ブランチ名から探索する — ブランチ名に含まれる番号やキーワードで `gh issue list --search "<キーワード>" --json number,title,state` を使いIssueを検索する
-3. `gh issue list --state open --limit 10 --json number,title,labels` で最近のオープンIssue一覧を取得し、ブランチ名・変更内容との関連性からIssueを推定する
-4. 結果に応じて分岐:
-   - **特定できた場合**: `gh issue view <番号> --json number,title,state` で検証し、タイトルを表示する。検証失敗（Issueが存在しない・クローズ済み）の場合はIssue無しとして続行する
-   - **複数候補がある場合**: 以下の優先順位で自動選択する — (1) Issue番号がコミットメッセージに直接含まれるもの (2) ブランチ名のキーワードとタイトルが一致するもの (3) 最も新しいIssue
-   - **特定できなかった場合**: Issue無しとして続行する（質問しない）
+1. Get commit messages with `git log main..HEAD --format=%s%n%b` and look for Issue numbers using the `#(\d+)` pattern
+2. Search from the branch name — use `gh issue list --search "<keyword>" --json number,title,state` with numbers or keywords from the branch name
+3. Get recent open Issues with `gh issue list --state open --limit 10 --json number,title,labels` and infer the Issue from relevance to the branch name and changes
+4. Branch based on the result:
+   - **Identified**: Verify with `gh issue view <number> --json number,title,state` and display the title. If verification fails (Issue doesn't exist or is closed), continue without an Issue
+   - **Multiple candidates**: Auto-select with the following priority — (1) Issue number directly included in commit messages (2) Branch name keyword matches the title (3) Most recent Issue
+   - **Not identified**: Continue without an Issue (do not ask)
 
-### Step 3: PR規模チェック
+### Step 3: PR Size Check
 
-1. `git diff --numstat main...HEAD` で変更ファイル数・追加行数・削除行数を計測する
-2. 自動生成ファイル（UIライブラリの生成ファイル等）は行数カウントから除外する
-3. 共通開発規約の上限（10ファイル/300行）と比較する:
-   - 超過している場合 → 警告とともにタスク分割の提案を表示して続行する（確認は求めない）
-   - 新規ファイル・ディレクトリの作成が中心の場合はその旨を注記し、例外規定に該当する旨を明示する
+1. Measure changed files, added lines, and deleted lines with `git diff --numstat main...HEAD`
+2. Exclude auto-generated files (UI library generated files, etc.) from line counts
+3. Compare against the shared development conventions limits (10 files / 300 lines):
+   - If exceeded → display a warning with a task-splitting suggestion and continue (do not request confirmation)
+   - If changes primarily consist of creating new files/directories, note this and state that the exception rule applies
 
-### Step 4: 差分分析
+### Step 4: Diff Analysis
 
-1. `git log main..HEAD --oneline` と `git diff main...HEAD --stat` で変更内容を把握する
-2. 必要に応じて `git diff main...HEAD` で詳細な差分を確認する
-3. ブランチプレフィックスからPRタイプを推定する:
+1. Understand the changes with `git log main..HEAD --oneline` and `git diff main...HEAD --stat`
+2. If needed, review detailed diffs with `git diff main...HEAD`
+3. Infer the PR type from the branch prefix:
 
-   | プレフィックス | PRタイトルのプレフィックス |
-   |----------------|---------------------------|
-   | `bugfix/`      | `fix: `                   |
-   | `feature/`     | `feat: `                  |
-   | `enhance/`     | `enhance: `               |
-   | `docs/`        | `docs: `                  |
-   | `chore/`       | `chore: `                 |
+   | Prefix         | PR Title Prefix |
+   |----------------|-----------------|
+   | `bugfix/`      | `fix: `         |
+   | `feature/`     | `feat: `        |
+   | `enhance/`     | `enhance: `     |
+   | `docs/`        | `docs: `        |
+   | `chore/`       | `chore: `       |
 
-### Step 5: ドキュメント整合性チェック
+### Step 5: Documentation Consistency Check
 
-`git diff main...HEAD --name-only` の差分ファイル一覧から、以下の汎用ヒューリスティクスでドキュメント更新が必要な変更を検出する:
+From the diff file list in `git diff main...HEAD --name-only`, detect changes that may require documentation updates using the following generic heuristics:
 
-1. **検出対象パターン**:
-   - **ルーティング追加**: `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` など、フレームワーク規約でルートを定義するファイルの新規追加（`git diff main...HEAD --diff-filter=A --name-only` で新規ファイルのみ抽出）
-   - **スキル追加**: `.claude/skills/` 配下のファイル追加・変更
-   - **設定ファイル変更**: プロジェクトルート直下の設定ファイル（`*.config.*`, `.*rc`, `.*rc.*`, `tsconfig*.json`, `package.json` の `scripts` セクション等）の変更
+1. **Detection patterns**:
+   - **Route additions**: New additions of files that define routes by framework convention, such as `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` (extract new files only with `git diff main...HEAD --diff-filter=A --name-only`)
+   - **Skill additions**: File additions/changes under `.claude/skills/`
+   - **Config file changes**: Changes to config files at the project root (`*.config.*`, `.*rc`, `.*rc.*`, `tsconfig*.json`, `scripts` section in `package.json`, etc.)
 
-2. **整合性チェック対象**: 検出された場合、以下のドキュメントの存在を確認し、内容と差分の整合性を検証する:
-   - `README.md` — 新機能・ルート・設定変更が反映されているか
-   - `.claude/skills/README.md` — スキル追加時にスキル一覧が更新されているか
-   - `.claude/rules/` 配下 — ルール関連の変更が反映されているか
+2. **Consistency check targets**: When detected, verify the existence and content consistency of:
+   - `README.md` — whether new features, routes, or config changes are reflected
+   - `.claude/skills/README.md` — whether the skill list is updated when skills are added
+   - `.claude/rules/` directory — whether rule-related changes are reflected
 
-3. **結果に応じた処理**:
-   - **不整合を検出した場合**: 以下の形式で警告を表示し、続行する（PR作成はブロックしない）:
+3. **Handling based on results**:
+   - **Inconsistency detected**: Display a warning in the following format and continue (do not block PR creation):
      ```
      ⚠️ ドキュメント整合性チェック:
      - <検出内容>: <対象ドキュメント>の更新が必要な可能性があります
      ```
-   - **検出対象パターンに該当しない場合**: 何も表示せずStep 6へ進む
+   - **No detection patterns matched**: Proceed to Step 6 without displaying anything
 
-### Step 6: PR作成
+### Step 6: Create PR
 
-1. PRタイトルを生成する（70文字以内、Step 4で推定したプレフィックスを使用）
-2. PR本文を以下のテンプレートで生成する:
+1. Generate a PR title (70 characters or less, using the prefix inferred in Step 4)
+2. Generate the PR body using the following template:
 
    ```
    ## Summary
@@ -97,19 +97,19 @@ description: Create a GitHub PR from the current branch - analyze changes, check
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
-3. `gh pr create --base main --title "..." --body "..."` でPRを作成する
-   - bodyはheredocを使用してフォーマットを保持する:
+3. Create the PR with `gh pr create --base main --title "..." --body "..."`
+   - Use a heredoc for the body to preserve formatting:
      ```
      gh pr create --base main --title "<タイトル>" --body "$(cat <<'EOF'
      <本文>
      EOF
      )"
      ```
-4. 失敗した場合はエラーメッセージを表示して終了する
+4. If it fails, display the error message and exit
 
-### Step 7: 結果表示
+### Step 7: Display Results
 
-作成結果を以下の形式で表示する:
+Display the creation results in the following format:
 
 ```
 ## PR作成完了
