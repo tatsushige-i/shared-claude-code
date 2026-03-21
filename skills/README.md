@@ -5,6 +5,7 @@
 | スキル | コマンド | 説明 |
 |---|---|---|
 | `config-claude-sync` | `/config-claude-sync` | `.claude/`配下（rules, skills）の差分検出・シンボリックリンク同期 |
+| `config-github-sync` | `/config-github-sync` | `.github/`配下（ISSUE_TEMPLATE, workflows）の差分検出・コピー同期 |
 | `git-branch-cleanup` | `/git-branch-cleanup` | ローカルブランチクリーンアップ（main切替・ブランチ削除・pull） |
 | `git-issue-create` | `/git-issue-create` | 会話の文脈からIssue作成（タイトル・本文・ラベル推定・プレビュー） |
 | `git-issue-start` | `/git-issue-start <Issue#>` | Issue取得・ラベル検証・ブランチ作成・Plan Mode移行 |
