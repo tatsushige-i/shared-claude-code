@@ -1,0 +1,25 @@
+name: Enhancement
+description: 既存機能の改善・拡張
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: 提案する機能や改善の内容を説明してください
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 動機
+      description: なぜこの機能・改善が必要か記載してください
+    validations:
+      required: false
+  - type: textarea
+    id: solution
+    attributes:
+      label: 実現方法の案
+      description: 実装のアイデアがあれば記載してください
+    validations:
+      required: false
