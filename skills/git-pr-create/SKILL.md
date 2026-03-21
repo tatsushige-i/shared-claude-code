@@ -57,7 +57,29 @@ description: Create a GitHub PR from the current branch - analyze changes, check
    | `docs/`        | `docs: `                  |
    | `chore/`       | `chore: `                 |
 
-### Step 5: PR作成
+### Step 5: ドキュメント整合性チェック
+
+`git diff main...HEAD --name-only` の差分ファイル一覧から、以下の汎用ヒューリスティクスでドキュメント更新が必要な変更を検出する:
+
+1. **検出対象パターン**:
+   - **ルーティング追加**: `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` など、フレームワーク規約でルートを定義するファイルの新規追加（`git diff main...HEAD --diff-filter=A --name-only` で新規ファイルのみ抽出）
+   - **スキル追加**: `.claude/skills/` 配下のファイル追加・変更
+   - **設定ファイル変更**: プロジェクトルート直下の設定ファイル（`*.config.*`, `.*rc`, `.*rc.*`, `tsconfig*.json`, `package.json` の `scripts` セクション等）の変更
+
+2. **整合性チェック対象**: 検出された場合、以下のドキュメントの存在を確認し、内容と差分の整合性を検証する:
+   - `README.md` — 新機能・ルート・設定変更が反映されているか
+   - `.claude/skills/README.md` — スキル追加時にスキル一覧が更新されているか
+   - `.claude/rules/` 配下 — ルール関連の変更が反映されているか
+
+3. **結果に応じた処理**:
+   - **不整合を検出した場合**: 以下の形式で警告を表示し、続行する（PR作成はブロックしない）:
+     ```
+     ⚠️ ドキュメント整合性チェック:
+     - <検出内容>: <対象ドキュメント>の更新が必要な可能性があります
+     ```
+   - **検出対象パターンに該当しない場合**: 何も表示せずStep 6へ進む
+
+### Step 6: PR作成
 
 1. PRタイトルを生成する（70文字以内、Step 4で推定したプレフィックスを使用）
 2. PR本文を以下のテンプレートで生成する:
@@ -85,7 +107,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
      ```
 4. 失敗した場合はエラーメッセージを表示して終了する
 
-### Step 6: 結果表示
+### Step 7: 結果表示
 
 作成結果を以下の形式で表示する:
 
