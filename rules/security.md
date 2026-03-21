@@ -1,8 +1,8 @@
-# セキュリティルール
+# Security Rules
 
-## シークレット管理
+## Secret Management
 
-- APIキー・トークン・パスワード等の機密情報をソースコードに直接記述しない
-- 環境変数（`.env.local`）を使用する
-- `.env*` ファイルが `.gitignore` に含まれていることを確認する
-- コミット前に機密情報が含まれていないことを確認する
+- Never hardcode sensitive information such as API keys, tokens, or passwords in source code
+- Use environment variables (`.env.local`)
+- Verify that `.env*` files are included in `.gitignore`
+- Confirm that no sensitive information is included before committing

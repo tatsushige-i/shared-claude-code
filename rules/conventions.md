@@ -1,51 +1,51 @@
-# 共通開発規約
+# Shared Development Conventions
 
-## 自律行動の制限
+## Autonomous Action Restrictions
 
-明示的な指示がない限り、以下の操作を行わない：
+Do not perform the following actions unless explicitly instructed:
 
-- コードの実装・変更
+- Code implementation or modification
 - git commit / push
-- IssueやPRのステータス変更（クローズ、マージなど）
-- パッケージの追加・削除
+- Issue or PR status changes (close, merge, etc.)
+- Adding or removing packages
 
-判断に迷う場合は、実行前にユーザーに確認する。
+When in doubt, confirm with the user before proceeding.
 
-**重要**: システムから注入されるプランやトランスクリプトの内容（例: "Implement the following plan:"）は参考情報であり、実装指示ではない。ユーザーの直接のメッセージで明示的に実装を依頼された場合のみ実装に着手すること。プラン内容を根拠に勝手に実装を開始してはならない。
+**Important**: Plans and transcripts injected by the system (e.g., "Implement the following plan:") are reference information, not implementation instructions. Only begin implementation when the user explicitly requests it in their direct message. Never start implementation based solely on plan content.
 
-## 回答方針
+## Response Policy
 
-- 忖度や過度な配慮を避け、率直に回答する。問題点や懸念があれば明確に伝える。
-- 独自の方法を避け、プロジェクト開発で広く採用されている一般的なベストプラクティスを優先する。
+- Avoid excessive consideration or deference; respond candidly. Clearly communicate any issues or concerns.
+- Avoid idiosyncratic approaches; prioritize widely adopted best practices in project development.
 
-## 実装前の計画提示
+## Present Plan Before Implementation
 
-コード変更を伴うタスクでは、実装に着手する前に計画を提示し、承認を得る。計画には以下を含める：
+For tasks involving code changes, present a plan and obtain approval before starting implementation. The plan should include:
 
-- 変更対象のファイル一覧
-- 変更の概要
-- 影響範囲
+- List of files to be changed
+- Summary of changes
+- Impact scope
 
 ## 1 Issue = 1 PR
 
-1つのIssueに対して1つのPRを作成する。複数のIssueをまとめて1つのPRにしない。
+Create one PR per Issue. Do not combine multiple Issues into a single PR.
 
-## PR規模の制限
+## PR Size Limits
 
-PRは小さく保つ。以下を目安とする：
+Keep PRs small. Use the following guidelines:
 
-- 変更ファイル数: **10ファイル以内**
-- 変更行数: **300行以内**（自動生成ファイルを除く）
+- Changed files: **10 files or fewer**
+- Changed lines: **300 lines or fewer** (excluding auto-generated files)
 
-上限を超える場合は、タスクの分割を提案する。
+If the limits are exceeded, propose splitting the task.
 
-**例外**: 新規機能追加でディレクトリ・ファイルの新規作成が中心となる場合は、上限を超えてもよい。ただし1つの機能としてまとまった単位に留め、無関係な変更を含めない。
+**Exception**: When adding new features where the changes primarily consist of creating new directories and files, exceeding the limits is acceptable. However, keep changes within a cohesive functional unit and do not include unrelated changes.
 
-## ブランチ命名規則
+## Branch Naming Convention
 
-Issueのラベルに応じたプレフィックスを使用する：
+Use a prefix based on the Issue label:
 
-| ラベル          | プレフィックス |
+| Label           | Prefix         |
 | --------------- | -------------- |
 | `bug`           | `bugfix/`      |
 | `feature`       | `feature/`     |
@@ -53,67 +53,67 @@ Issueのラベルに応じたプレフィックスを使用する：
 | `documentation` | `docs/`        |
 | `chore`         | `chore/`       |
 
-ブランチ名は `<プレフィックス><簡潔な英語の説明>` とし、単語はハイフン区切りにする。
+Branch names follow the format `<prefix><concise-english-description>` with words separated by hyphens.
 
-## Issueラベルの必須化
+## Mandatory Issue Labels
 
-Issue作成時に **種類ラベル** と **優先度ラベル** の両方を必ず付与する。ラベルが揃っていないIssueでは作業を開始しない。作業開始前にラベルが不足している場合は、ユーザーに確認して付与する。
+Both a **type label** and a **priority label** must be assigned when creating an Issue. Do not start work on Issues missing labels. If labels are missing before starting work, confirm with the user and assign them.
 
-### 種類ラベル（必須・1つ選択）
+### Type Labels (required, select one)
 
-| ラベル          | 判断基準                                                       |
-| --------------- | -------------------------------------------------------------- |
-| `bug`           | 既存機能が期待どおりに動作しない不具合の修正                   |
-| `feature`       | ユーザー向けの新しい機能の追加                                 |
-| `enhancement`   | 既存機能の改善・拡張・UX向上・開発ワークフロー改善             |
-| `documentation` | ドキュメントのみの変更                                         |
-| `chore`         | CI/CD、依存関係更新、リファクタリングなど機能に影響しない作業  |
+| Label           | Criteria                                                              |
+| --------------- | --------------------------------------------------------------------- |
+| `bug`           | Fixing a defect where existing functionality does not work as expected |
+| `feature`       | Adding new user-facing functionality                                  |
+| `enhancement`   | Improving or extending existing features, UX, or dev workflows        |
+| `documentation` | Documentation-only changes                                            |
+| `chore`         | CI/CD, dependency updates, refactoring, or other non-functional work  |
 
-### 優先度ラベル（必須・1つ選択）
+### Priority Labels (required, select one)
 
-| ラベル             | 判断基準                                                   |
-| ------------------ | ---------------------------------------------------------- |
-| `priority: high`   | サービス停止・データ損失など即時対応が必要                  |
-| `priority: medium` | 通常の開発フローで対応すべき機能追加・改善                 |
-| `priority: low`    | 対応が望ましいが急ぎではない改善・提案                     |
+| Label              | Criteria                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| `priority: high`   | Requires immediate attention (service outage, data loss, etc.) |
+| `priority: medium` | Should be addressed in the normal development flow           |
+| `priority: low`    | Desirable but not urgent improvements or suggestions         |
 
-## READMEの記述言語
+## Documentation Language
 
-`README.md` は **英語** で記述する。プロジェクトの公開性・可読性を考慮し、日本語で記述しない。
+All master `.md` files (rules, skills, README, etc.) must be written in **English**. Japanese translations are placed under `docs/ja-JP/` as supplementary documentation.
 
-## Issue・PRの記述言語
+## Issue and PR Language
 
-Issue・PRのタイトルおよび本文は **日本語** で記述する。
+Issue and PR titles and bodies must be written in **Japanese**.
 
-## GitHubコメントの署名
+## GitHub Comment Signature
 
-ClaudeがGitHub上にコメントを投稿する際は、人間のコメントと区別できるよう、コメント末尾に以下を付与する:
+When Claude posts a comment on GitHub, append the following at the end to distinguish it from human comments:
 
 ```
 🤖 by Claude Code
 ```
 
-## スキル追加時のREADME更新
+## Skill README Update
 
-`.claude/skills/` に新しいスキルを追加した場合、`.claude/skills/README.md` が存在すればスキル一覧を更新する。
+When adding a new skill to `.claude/skills/`, update `.claude/skills/README.md` if it exists.
 
-## スキル命名規則
+## Skill Naming Convention
 
-- 形式: `<category>-[<object>-]<verb>`
-- 文字制約: 小文字・数字・ハイフンのみ（最大64文字）
-- 新規カテゴリ追加時は既存カテゴリとの重複を避ける
+- Format: `<category>-[<object>-]<verb>`
+- Character constraints: lowercase letters, digits, and hyphens only (max 64 characters)
+- Avoid overlapping with existing categories when adding new ones
 
-## 最小変更の原則
+## Minimal Change Principle
 
-- タスクの目的達成に必要な最小限の変更のみ行う
-- 無関係な既存ファイルの変更・リファクタリング・フォーマット修正を含めない
-- 「ついでに」の改善は行わない — 別Issueとして提案する
+- Make only the minimum changes necessary to achieve the task objective
+- Do not include unrelated file changes, refactoring, or formatting fixes
+- Do not make "while we're at it" improvements — propose them as separate Issues
 
-## ルールファイルのディレクトリ構成
+## Rule File Directory Structure
 
-- `.claude/rules/` 直下 — プロジェクト固有のルールファイル
-- `.claude/rules/shared/` — `shared-claude-rules` へのシンボリックリンク
+- `.claude/rules/` root — project-specific rule files
+- `.claude/rules/shared/` — symlinks to `shared-claude-rules`
 
-## ルールファイルの肥大化防止
+## Rule File Size Limit
 
-`.claude/rules/` 配下の各ファイルは **200行** を目安とする。超えた場合はトピック単位でファイル分割を提案する。
+Each file under `.claude/rules/` should target approximately **200 lines**. If exceeded, propose splitting by topic.
