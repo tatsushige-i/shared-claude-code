@@ -1,5 +1,5 @@
 ---
-name: config-shared-sync
+name: config-claude-sync
 description: Sync shared rules and skills from shared-claude-rules repository - detect missing symlinks and create them
 ---
 
