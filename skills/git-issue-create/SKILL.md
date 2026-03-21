@@ -5,38 +5,38 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 
 # Create Issue Skill
 
-会話の文脈からGitHub Issueを作成するワークフローを自動化する。コンテキスト分析・タイトルと本文の生成・ラベル推定・プレビュー確認・Issue作成を一連の流れで行う。
+Automate the workflow for creating GitHub Issues from conversation context. Performs context analysis, title/body generation, label inference, preview confirmation, and Issue creation in a single flow.
 
-## 処理手順
+## Steps
 
-### Step 1: コンテキスト分析
+### Step 1: Context Analysis
 
-1. 会話の文脈から、Issue化すべき主題・目的を把握する
-2. 共通開発規約（`conventions.md`）の「Issueラベルの必須化」セクションに基づき、以下を推定する:
-   - **種類ラベル**: 以下の判断基準で1つ選択する
+1. Identify the subject and purpose to be turned into an Issue from the conversation context
+2. Based on the "Mandatory Issue Labels" section in the shared development conventions (`conventions.md`), infer the following:
+   - **Type label**: Select one based on the following criteria
 
-     | ラベル          | 判断基準                                                       |
-     |-----------------|----------------------------------------------------------------|
-     | `bug`           | 既存機能が期待どおりに動作しない不具合の修正                   |
-     | `feature`       | ユーザー向けの新しい機能の追加                                 |
-     | `enhancement`   | 既存機能の改善・拡張・UX向上・開発ワークフロー改善             |
-     | `documentation` | ドキュメントのみの変更                                         |
-     | `chore`         | CI/CD、依存関係更新、リファクタリングなど機能に影響しない作業  |
+     | Label           | Criteria                                                              |
+     |-----------------|-----------------------------------------------------------------------|
+     | `bug`           | Fixing a defect where existing functionality does not work as expected |
+     | `feature`       | Adding new user-facing functionality                                  |
+     | `enhancement`   | Improving or extending existing features, UX, or dev workflows        |
+     | `documentation` | Documentation-only changes                                            |
+     | `chore`         | CI/CD, dependency updates, refactoring, or other non-functional work  |
 
-   - **優先度ラベル**: 以下の判断基準で1つ選択する
+   - **Priority label**: Select one based on the following criteria
 
-     | ラベル             | 判断基準                                                   |
-     |--------------------|-------------------------------------------------------------|
-     | `priority: high`   | サービス停止・データ損失など即時対応が必要                  |
-     | `priority: medium` | 通常の開発フローで対応すべき機能追加・改善                 |
-     | `priority: low`    | 対応が望ましいが急ぎではない改善・提案                     |
+     | Label              | Criteria                                                     |
+     |--------------------|--------------------------------------------------------------|
+     | `priority: high`   | Requires immediate attention (service outage, data loss, etc.) |
+     | `priority: medium` | Should be addressed in the normal development flow           |
+     | `priority: low`    | Desirable but not urgent improvements or suggestions         |
 
-### Step 2: Issue内容の生成
+### Step 2: Generate Issue Content
 
-1. **タイトル**: 日本語で50文字以内を目安に生成する
-2. **本文**: 日本語で、種類ラベルに応じたテンプレートで生成する:
+1. **Title**: Generate in Japanese, targeting around 50 characters
+2. **Body**: Generate in Japanese using the template appropriate for the type label:
 
-   **`feature` / `enhancement` / `bug` の場合:**
+   **For `feature` / `enhancement` / `bug`:**
    ```
    ## 概要
    <1-2文で変更の目的を説明>
@@ -52,7 +52,7 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    - [ ] <条件2>
    ```
 
-   **`documentation` / `chore` の場合:**
+   **For `documentation` / `chore`:**
    ```
    ## 概要
    <1-2文で変更の目的を説明>
@@ -65,9 +65,9 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    - [ ] <条件2>
    ```
 
-### Step 3: プレビュー・ユーザー確認
+### Step 3: Preview and User Confirmation
 
-以下の形式でプレビューを表示し、ユーザーの承認を得る:
+Display a preview in the following format and obtain user approval:
 
 ```
 ## Issueプレビュー
@@ -83,23 +83,23 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 この内容でIssueを作成してよろしいですか？修正点があればお知らせください。
 ```
 
-- ユーザーが承認した場合 → Step 4へ進む
-- ユーザーが修正を指示した場合 → 修正を反映して再度プレビューを表示する
+- If the user approves → proceed to Step 4
+- If the user requests changes → apply the changes and display the preview again
 
-### Step 4: Issue作成
+### Step 4: Create Issue
 
-1. `gh issue create` でIssueを作成する:
+1. Create the Issue using `gh issue create`:
    ```
    gh issue create --title "<タイトル>" --label "<種類ラベル>" --label "<優先度ラベル>" --body "$(cat <<'EOF'
    <本文>
    EOF
    )"
    ```
-2. 失敗した場合はエラーメッセージを表示して終了する
+2. If it fails, display the error message and exit
 
-### Step 5: 結果表示
+### Step 5: Display Results
 
-作成結果を以下の形式で表示する:
+Display the creation results in the following format:
 
 ```
 ## Issue作成完了
