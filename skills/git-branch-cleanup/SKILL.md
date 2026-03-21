@@ -11,12 +11,20 @@ PR作成・マージ後のローカルブランチクリーンアップを自動
 
 このスキルはユーザーが明示的に `/git-branch-cleanup` を実行した時点で全操作が承認済みである。以下を厳守すること:
 
-- **全ステップを中断なしで一気に実行する。途中でユーザーに確認・承認を求めてはならない**
+- **全操作を1つのBash tool callのコマンドチェーンで実行する。Bash tool callを分割してはならない**
 - `git checkout main`, `git branch -D`, `git pull` はすべて事前承認済みの操作として扱う
 - ステップ間で「実行してよいですか？」「続行しますか？」等の質問を挟まない
-- 各コマンドは逐次実行し、エラーが発生した場合のみ停止する
+- エラーが発生した場合のみ停止する
 
-## 処理手順
+## 実行コマンド
+
+以下のコマンドチェーンを**1つのBash tool call**でそのまま実行する:
+
+```bash
+set -e; STATUS=$(git status --porcelain); [ -n "$STATUS" ] && echo "エラー: 未コミットの変更があります。" && exit 1; git checkout main 2>&1; git branch | grep -v '^\*' | xargs -r git branch -D 2>&1; git pull 2>&1
+```
+
+## 処理手順（参考）
 
 ### Step 1: 前提条件の確認
 
