@@ -50,6 +50,8 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    ## 受け入れ条件
    - [ ] <条件1>
    - [ ] <条件2>
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
    **`documentation` / `chore` の場合:**
@@ -63,6 +65,8 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    ## 受け入れ条件
    - [ ] <条件1>
    - [ ] <条件2>
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
 ### Step 3: プレビュー・ユーザー確認

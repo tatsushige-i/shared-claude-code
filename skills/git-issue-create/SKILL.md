@@ -50,6 +50,8 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
    ## 受け入れ条件
    - [ ] <条件1>
    - [ ] <条件2>
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
    **For `documentation` / `chore`:**
@@ -63,6 +65,8 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
    ## 受け入れ条件
    - [ ] <条件1>
    - [ ] <条件2>
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
 ### Step 3: Preview and User Confirmation

@@ -174,7 +174,11 @@ Reply content guidelines:
 
 Write replies in Japanese (when the reviewer uses Japanese). If the review comment is in English, reply in English.
 
-**Signature**: Follow the "GitHub Comment Signature" rule in the shared development conventions, appending a signature at the end of each reply.
+**Signature**: Append the following signature at the end of each reply body:
+
+```
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
 
 ### Step 10: Completion Summary
 
