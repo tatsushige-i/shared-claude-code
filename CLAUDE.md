@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repository Is
 
-A centralized source of shared Claude Code rules and skills distributed to consuming projects via symlinks. All consuming repositories must live in the same parent directory as this one.
+A centralized source of shared Claude Code rules and skills distributed to consuming projects. All consuming repositories must live in the same parent directory as this one.
+
+**Distribution methods:**
+- **Rules and skills** — distributed via symlinks into `.claude/rules/` and `.claude/skills/` of consuming repos
+- **GitHub configuration and CI templates** — distributed via file copy using the `/config-github-sync` skill
 
 **Symlink pattern** (from a consuming repo):
 ```bash
@@ -18,10 +22,10 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
 skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
   README.md     # Skills index table — must be updated when adding a skill
-ci-templates/   # CI/config templates by language — copy to consuming repos
-  nextjs/       # Next.js template (ci.yml + package.json + config files)
+ci-templates/   # CI/config templates by language — copied to consuming repos via /config-github-sync
+  nextjs/       # Next.js template (ESLint, Jest, TypeScript configs)
 .github/
-  ISSUE_TEMPLATE/   # 5 issue templates (Japanese)
+  ISSUE_TEMPLATE/   # Issue templates (Japanese) — copied to consuming repos via /config-github-sync
 docs/ja-JP/     # Japanese translations (supplementary, not authoritative)
 .claude/
   rules/        # Symlinks → ../../rules/

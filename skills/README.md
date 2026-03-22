@@ -1,6 +1,6 @@
 # Skills
 
-Shared skills referenced via symlinks from each project.
+Shared skills distributed to consuming repositories via symlinks. Each skill is invoked as a slash command in Claude Code. Use `/config-claude-sync` to detect missing symlinks and sync them automatically.
 
 | Skill | Command | Description |
 |---|---|---|
