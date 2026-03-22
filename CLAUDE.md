@@ -22,14 +22,17 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
 skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
   README.md     # Skills index table — must be updated when adding a skill
+.claude/
+  rules/        # Symlinks → ../../rules/
+  skills/       # Symlinks → ../../skills/
 ci-templates/   # CI/config templates by language — copied to consuming repos via /config-github-sync
   nextjs/       # Next.js template (ESLint, Jest, TypeScript configs)
 .github/
   ISSUE_TEMPLATE/   # Issue templates (Japanese) — copied to consuming repos via /config-github-sync
 docs/ja-JP/     # Japanese translations (supplementary, not authoritative)
-.claude/
-  rules/        # Symlinks → ../../rules/
-  skills/       # Symlinks → ../../skills/
+  rules/        # Translations of rules/
+  skills/       # Translations of skills/
+  local-skills/ # Translations of local skills
 ```
 
 ## Adding a New Skill
@@ -49,3 +52,11 @@ Prefix the skill name with `local-` (e.g., `local-docs-validate`).
 
 1. Create `.claude/skills/local-<name>/SKILL.md` directly with YAML frontmatter (`name`, `description`)
 2. Add Japanese translation at `docs/ja-JP/local-skills/local-<name>/SKILL.md`
+
+## Adding a New Rule
+
+### Shared Rule (distributed to consuming repos via symlinks)
+
+1. Create `rules/<name>.md`
+2. Add a symlink: `.claude/rules/<name>.md -> ../../rules/<name>.md`
+3. Add Japanese translation at `docs/ja-JP/rules/<name>.md`
