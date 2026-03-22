@@ -1,6 +1,6 @@
 ---
 name: config-github-sync
-description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-code repository - detect diffs and copy files
+description: Sync .github files and ci-templates from shared-claude-code repository - detect language, present diffs, and copy files
 ---
 
 # GitHub Config Sync Skill
@@ -65,7 +65,55 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
 3. コピー後、`diff -q` で内容が一致することを検証する
    - 不一致の場合 → エラーを表示する
 
-### Step 5: 結果表示
+### Step 5: CI テンプレート同期
+
+1. shared リポジトリに `ci-templates/` ディレクトリが存在するか確認する。存在しない場合はこのステップをスキップする。
+2. **プロジェクトの言語/フレームワークを推定する**（ローカルのプロジェクトルートを確認）:
+   - `package.json` あり → Node.js 系。`dependencies.next` または `devDependencies.next` があれば **Next.js** と判定
+   - `pyproject.toml` または `setup.py` あり → **Python**
+   - `go.mod` あり → **Go**
+   - `ci-templates/` 配下の利用可能なテンプレートディレクトリも候補として列挙する
+3. **候補を提示してユーザーに確認する**:
+   ```
+   ## CI テンプレート同期
+
+   推定フレームワーク: Next.js（package.json の dependencies.next を検出）
+
+   利用可能なテンプレート:
+   - nextjs（推奨）
+
+   同期するテンプレートを選択してください（スキップする場合は「スキップ」と入力）。
+   ```
+   - 一致するテンプレートがない場合 → 利用可能なテンプレートを表示し、選択またはスキップを促す
+4. **選択されたテンプレートの差分を検出する**:
+   - `ci-templates/<lang>/.github/workflows/ci.yml` ↔ ローカルの `.github/workflows/ci.yml`
+   - `ci-templates/<lang>/` 直下の各ファイル（`.github/` 以外）↔ ローカルのプロジェクトルートの同名ファイル
+   - 各ファイルを **同一**・**差分あり**・**新規**・**ローカルのみ** に分類（Step 2 と同じ基準）
+5. **差分を提示してユーザーに確認する**:
+   - すべて同一の場合 → 「CI テンプレートのファイルはすべて同期済みです。」と表示してコピーをスキップ
+   - 差分がある場合、カテゴリ別に状態を一覧表示する:
+     ```
+     ### CI テンプレート（nextjs）
+     #### .github/workflows
+     - ci.yml — 差分あり
+
+     #### プロジェクトルート
+     - package.json — ローカルに存在しない（新規追加）
+     - tsconfig.json — 差分あり
+     - jest.config.mjs — 同一 ✓
+
+     同期する項目を選択してください（例: 全て / ci.ymlのみ）。
+     差分の詳細を確認したい場合はお知らせください。
+     ```
+   - ユーザーが差分詳細を要求した場合 → `diff` 出力を表示する
+   - ユーザーの回答に応じて同期対象を決定する
+6. **ファイルをコピーする**:
+   - コピー先ディレクトリが存在しない場合は `mkdir -p` で作成する
+   - 選択されたファイルを `cp` で上書きコピーする
+   - コピー後、`diff -q` で内容が一致することを検証する
+     - 不一致の場合 → エラーを表示する
+
+### Step 6: 結果表示
 
 同期結果を以下の形式で表示する:
 
@@ -77,4 +125,9 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
   - <ファイル名2>（更新）
 - 同期したワークフロー: X件
   - <ファイル名1>（更新）
+- 同期したCIテンプレート（<lang>）: X件
+  - .github/workflows/ci.yml（更新）
+  - tsconfig.json（新規追加）
 ```
+
+CI テンプレートを同期しなかった場合は、該当行を省略する。

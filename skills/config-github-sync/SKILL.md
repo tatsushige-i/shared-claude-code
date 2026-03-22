@@ -1,6 +1,6 @@
 ---
 name: config-github-sync
-description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-code repository - detect diffs and copy files
+description: Sync .github files and ci-templates from shared-claude-code repository - detect language, present diffs, and copy files
 ---
 
 # GitHub Config Sync Skill
@@ -65,7 +65,55 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-
 3. After copying, verify contents match with `diff -q`
    - If mismatch → display error
 
-### Step 5: Display Results
+### Step 5: CI Template Sync
+
+1. Check whether the `ci-templates/` directory exists in the shared repository. If it does not exist, skip this step.
+2. **Detect the project language/framework** from the local project root:
+   - `package.json` present → Node.js family. If `dependencies.next` or `devDependencies.next` is found → **Next.js**
+   - `pyproject.toml` or `setup.py` present → **Python**
+   - `go.mod` present → **Go**
+   - List available template directories under `ci-templates/` as additional candidates
+3. **Present candidates and confirm with the user**:
+   ```
+   ## CI テンプレート同期
+
+   推定フレームワーク: Next.js（package.json の dependencies.next を検出）
+
+   利用可能なテンプレート:
+   - nextjs（推奨）
+
+   同期するテンプレートを選択してください（スキップする場合は「スキップ」と入力）。
+   ```
+   - If no matching template is found → display available templates and ask the user to choose or skip
+4. **Detect differences** for the selected template:
+   - `ci-templates/<lang>/.github/workflows/ci.yml` vs local `.github/workflows/ci.yml`
+   - Each file directly under `ci-templates/<lang>/` (non-`.github/` items) vs the same filename at the local project root
+   - Categorize each file as **Identical**, **Differs**, **New**, or **Local only** (same criteria as Step 2)
+5. **Present differences and confirm with the user**:
+   - If all files are identical → display "CI テンプレートのファイルはすべて同期済みです。" and skip copying
+   - If differences exist, display by category:
+     ```
+     ### CI テンプレート（nextjs）
+     #### .github/workflows
+     - ci.yml — 差分あり
+
+     #### プロジェクトルート
+     - package.json — ローカルに存在しない（新規追加）
+     - tsconfig.json — 差分あり
+     - jest.config.mjs — 同一 ✓
+
+     同期する項目を選択してください（例: 全て / ci.ymlのみ）。
+     差分の詳細を確認したい場合はお知らせください。
+     ```
+   - If the user requests diff details → show `diff` output
+   - Determine sync targets based on the user's response
+6. **Copy files**:
+   - Create destination directories with `mkdir -p` if they do not exist
+   - Overwrite-copy selected files with `cp`
+   - After copying, verify contents match with `diff -q`
+     - If mismatch → display error
+
+### Step 6: Display Results
 
 Display sync results in the following format:
 
@@ -77,4 +125,9 @@ Display sync results in the following format:
   - <ファイル名2>（更新）
 - 同期したワークフロー: X件
   - <ファイル名1>（更新）
+- 同期したCIテンプレート（<lang>）: X件
+  - .github/workflows/ci.yml（更新）
+  - tsconfig.json（新規追加）
 ```
+
+CI テンプレートを同期しなかった場合は、該当行を省略する。
