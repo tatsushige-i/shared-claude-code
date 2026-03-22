@@ -4,7 +4,11 @@
 
 ## このリポジトリについて
 
-シンボリックリンクを通じて複数のプロジェクトへ配布する、Claude Code の共通ルールとスキルの集約リポジトリです。すべての消費リポジトリは、このリポジトリと同じ親ディレクトリに配置する必要があります。
+複数のプロジェクトへ配布する、Claude Code の共通ルールとスキルの集約リポジトリです。すべての消費リポジトリは、このリポジトリと同じ親ディレクトリに配置する必要があります。
+
+**配布方式:**
+- **ルールとスキル** — シンボリックリンクで消費リポジトリの `.claude/rules/` と `.claude/skills/` に配布
+- **GitHub設定とCIテンプレート** — `/config-github-sync` スキルによるファイルコピーで配布
 
 **シンボリックリンクの作成例**（消費リポジトリ側で実行）:
 ```bash
@@ -18,10 +22,10 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # マスタールールファイル（英語） — 消費リポジトリの .claude/rules/ にシンボリックリンク
 skills/         # マスタースキル定義 — 消費リポジトリの .claude/skills/ にシンボリックリンク
   README.md     # スキル一覧テーブル — スキル追加時に更新必須
-ci-templates/   # 言語別CIテンプレート — 消費リポジトリへコピーして使用
-  nextjs/       # Next.js テンプレート（ci.yml + package.json + 設定ファイル）
+ci-templates/   # 言語別CIテンプレート — /config-github-sync によるファイルコピーで消費リポジトリに配布
+  nextjs/       # Next.js テンプレート（ESLint, Jest, TypeScript設定）
 .github/
-  ISSUE_TEMPLATE/   # Issue テンプレート 5種（日本語）
+  ISSUE_TEMPLATE/   # Issueテンプレート（日本語） — /config-github-sync によるファイルコピーで消費リポジトリに配布
 docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
 .claude/
   rules/        # シンボリックリンク → ../../rules/
