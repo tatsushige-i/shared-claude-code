@@ -18,9 +18,10 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # マスタールールファイル（英語） — 消費リポジトリの .claude/rules/ にシンボリックリンク
 skills/         # マスタースキル定義 — 消費リポジトリの .claude/skills/ にシンボリックリンク
   README.md     # スキル一覧テーブル — スキル追加時に更新必須
+ci-templates/   # 言語別CIテンプレート — 消費リポジトリへコピーして使用
+  nextjs/       # Next.js テンプレート（ci.yml + package.json + 設定ファイル）
 .github/
   ISSUE_TEMPLATE/   # Issue テンプレート 5種（日本語）
-  workflows/ci.yml  # CI: eol-check → lint → test → build
 docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
 .claude/
   rules/        # シンボリックリンク → ../../rules/
