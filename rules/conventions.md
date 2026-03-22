@@ -90,7 +90,7 @@ Issue and PR titles and bodies must be written in **Japanese**.
 When Claude posts a comment on GitHub, append the following at the end to distinguish it from human comments:
 
 ```
-🤖 by Claude Code
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
 ## Skill README Update

@@ -90,7 +90,7 @@ Issue・PRのタイトルおよび本文は **日本語** で記述する。
 ClaudeがGitHub上にコメントを投稿する際は、人間のコメントと区別できるよう、コメント末尾に以下を付与する:
 
 ```
-🤖 by Claude Code
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
 ## スキル追加時のREADME更新
