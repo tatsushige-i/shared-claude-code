@@ -1,23 +1,23 @@
 ---
 name: config-github-sync
-description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-rules repository - detect diffs and copy files
+description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-code repository - detect diffs and copy files
 ---
 
 # GitHub Config Sync Skill
 
-Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-claude-rules repository to the current project using file copies. File copies are used because GitHub does not recognize symlinks.
+Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-claude-code repository to the current project using file copies. File copies are used because GitHub does not recognize symlinks.
 
 ## Steps
 
 ### Step 1: Locate the Shared Repository
 
 1. Search for symlinks under `.claude/rules/shared/` and `.claude/skills/`
-2. Resolve the shared-claude-rules repository path from the `readlink` result of found symlinks
-   - Rule link example: `../../../shared-claude-rules/rules/conventions.md` → extract `shared-claude-rules` path
-   - Skill link example: `../../shared-claude-rules/skills/git-pr-create` → extract `shared-claude-rules` path
+2. Resolve the shared-claude-code repository path from the `readlink` result of found symlinks
+   - Rule link example: `../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
+   - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
    ```
-   エラー: shared-claude-rulesへのシンボリックリンクが見つかりません。
+   エラー: shared-claude-codeへのシンボリックリンクが見つかりません。
    最初のセットアップはREADMEの手順に従って手動で行ってください。
    ```
 4. Verify that the `.github/` directory exists at the resolved path

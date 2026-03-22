@@ -1,4 +1,4 @@
-# shared-claude-rules
+# shared-claude-code
 
 シンボリックリンクを使い、複数リポジトリで共有するClaude Codeのルールとスキル。
 
@@ -21,12 +21,12 @@ skills/
 
 ```bash
 # 対象リポジトリのルートから実行
-ln -s ../../shared-claude-rules/rules/conventions.md .claude/rules/conventions.md
-ln -s ../../shared-claude-rules/rules/security.md .claude/rules/security.md
-ln -s ../../shared-claude-rules/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
-ln -s ../../shared-claude-rules/skills/git-issue-start .claude/skills/git-issue-start
-ln -s ../../shared-claude-rules/skills/git-pr-create .claude/skills/git-pr-create
-ln -s ../../shared-claude-rules/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/conventions.md
+ln -s ../../shared-claude-code/rules/security.md .claude/rules/security.md
+ln -s ../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
+ln -s ../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
+ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ```
 
 **前提条件**: すべてのリポジトリが同じ親ディレクトリに配置されていること。

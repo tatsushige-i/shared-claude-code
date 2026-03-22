@@ -1,23 +1,23 @@
 ---
 name: config-claude-sync
-description: Sync shared rules and skills from shared-claude-rules repository - detect missing symlinks and create them
+description: Sync shared rules and skills from shared-claude-code repository - detect missing symlinks and create them
 ---
 
 # Shared Config Sync Skill
 
-Sync shared rules and skills from the shared-claude-rules repository to the current project. Detect missing symlinks and create them after user confirmation.
+Sync shared rules and skills from the shared-claude-code repository to the current project. Detect missing symlinks and create them after user confirmation.
 
 ## Steps
 
 ### Step 1: Locate the Shared Repository
 
 1. Search for symlinks under `.claude/rules/shared/` and `.claude/skills/`
-2. Resolve the shared-claude-rules repository path from the `readlink` result of found symlinks
-   - Rule link example: `../../../shared-claude-rules/rules/conventions.md` → extract `shared-claude-rules` path
-   - Skill link example: `../../shared-claude-rules/skills/git-pr-create` → extract `shared-claude-rules` path
+2. Resolve the shared-claude-code repository path from the `readlink` result of found symlinks
+   - Rule link example: `../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
+   - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
    ```
-   エラー: shared-claude-rulesへのシンボリックリンクが見つかりません。
+   エラー: shared-claude-codeへのシンボリックリンクが見つかりません。
    最初のセットアップはREADMEの手順に従って手動で行ってください。
    ```
 4. Verify that `rules/` and `skills/` directories exist at the resolved path
@@ -25,8 +25,8 @@ Sync shared rules and skills from the shared-claude-rules repository to the curr
 
 ### Step 2: Detect Differences
 
-1. Get the list of `.md` files under `rules/` in shared-claude-rules
-2. Get the list of directories containing `SKILL.md` under `skills/` in shared-claude-rules
+1. Get the list of `.md` files under `rules/` in shared-claude-code
+2. Get the list of directories containing `SKILL.md` under `skills/` in shared-claude-code
 3. Compare with the current project and detect missing items:
    - **Rules**: no symlink exists at `.claude/rules/shared/<name>.md`
    - **Skills**: no symlink exists at `.claude/skills/<name>`
@@ -74,10 +74,10 @@ Sync shared rules and skills from the shared-claude-rules repository to the curr
 1. Rule sync:
    - Create `.claude/rules/shared/` directory with `mkdir -p` if it does not exist
    - Get the prefix from the `readlink` result of existing rule symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../../shared-claude-rules/rules/conventions.md`, create new ones as `../../../shared-claude-rules/rules/<name>.md`
+   - Example: if an existing link is `../../../shared-claude-code/rules/conventions.md`, create new ones as `../../../shared-claude-code/rules/<name>.md`
 2. Skill sync:
    - Get the prefix from the `readlink` result of existing skill symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../shared-claude-rules/skills/git-pr-create`, create new ones as `../../shared-claude-rules/skills/<name>`
+   - Example: if an existing link is `../../shared-claude-code/skills/git-pr-create`, create new ones as `../../shared-claude-code/skills/<name>`
 3. After creating each symlink, verify that the link target resolves correctly
 
 ### Step 6: Commit
