@@ -22,14 +22,17 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # マスタールールファイル（英語） — 消費リポジトリの .claude/rules/ にシンボリックリンク
 skills/         # マスタースキル定義 — 消費リポジトリの .claude/skills/ にシンボリックリンク
   README.md     # スキル一覧テーブル — スキル追加時に更新必須
+.claude/
+  rules/        # シンボリックリンク → ../../rules/
+  skills/       # シンボリックリンク → ../../skills/
 ci-templates/   # 言語別CIテンプレート — /config-github-sync によるファイルコピーで消費リポジトリに配布
   nextjs/       # Next.js テンプレート（ESLint, Jest, TypeScript設定）
 .github/
   ISSUE_TEMPLATE/   # Issueテンプレート（日本語） — /config-github-sync によるファイルコピーで消費リポジトリに配布
 docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
-.claude/
-  rules/        # シンボリックリンク → ../../rules/
-  skills/       # シンボリックリンク → ../../skills/
+  rules/        # rules/ の翻訳
+  skills/       # skills/ の翻訳
+  local-skills/ # ローカルスキルの翻訳
 ```
 
 ## 新しいスキルの追加手順
@@ -49,3 +52,11 @@ docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
 
 1. `.claude/skills/local-<name>/SKILL.md` を YAML フロントマター（`name`, `description`）付きで直接作成（シンボリックリンク不要）
 2. `docs/ja-JP/local-skills/local-<name>/SKILL.md` に日本語翻訳を追加
+
+## 新しいルールの追加手順
+
+### 共有ルール（シンボリックリンク経由で消費リポジトリに配布）
+
+1. `rules/<name>.md` を作成
+2. シンボリックリンクを追加: `.claude/rules/<name>.md -> ../../rules/<name>.md`
+3. `docs/ja-JP/rules/<name>.md` に日本語翻訳を追加
