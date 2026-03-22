@@ -80,15 +80,38 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
    - Example: if an existing link is `../../shared-claude-code/skills/git-pr-create`, create new ones as `../../shared-claude-code/skills/<name>`
 3. After creating each symlink, verify that the link target resolves correctly
 
-### Step 6: Commit
+### Step 6: Update Documentation
+
+If new skills were synced in Step 5, update documentation files that list skills. Skip this step if only rules were synced.
+
+1. Check if `.claude/skills/README.md` exists in the current project
+   - If it exists:
+     - For each synced skill, check whether the skill name already appears in the file
+     - For skills not yet listed, read the `description` from the `SKILL.md` frontmatter in the shared-claude-code `skills/<name>/SKILL.md`
+     - Append a table row at the end of the existing table: `| \`<name>\` | \`/<name>\` | <description> |`
+     - Stage the file with `git add .claude/skills/README.md`
+   - If it does not exist: skip
+2. Check if `docs/ja-JP/skills/README.md` exists in the current project
+   - If it exists:
+     - Apply the same process: check for missing entries and append table rows for unregistered skills
+     - Stage the file with `git add docs/ja-JP/skills/README.md`
+   - If it does not exist: skip
+3. Check if `CLAUDE.md` in the project root contains a skills listing (e.g., a table or list mentioning existing skill names)
+   - If it contains a skills listing:
+     - For each synced skill not yet listed, append an entry matching the existing format
+     - Stage the file with `git add CLAUDE.md`
+   - If `CLAUDE.md` does not exist or does not contain a skills listing: skip
+
+### Step 7: Commit
 
 1. Stage the symlinks created in Step 5 individually (do not use `git add -A` or `git add .`):
    - Rules: `git add .claude/rules/shared/<name>.md`
    - Skills: `git add .claude/skills/<name>`
+   - README files staged in Step 6 are already included
 2. Commit with `git commit -m "chore: sync shared claude rules and skills"`
-3. If the commit fails (e.g., no staged files), display a warning and proceed to Step 7
+3. If the commit fails (e.g., no staged files), display a warning and proceed to Step 8
 
-### Step 7: Display Results
+### Step 8: Display Results
 
 Display sync results in the following format:
 
@@ -103,9 +126,11 @@ Display sync results in the following format:
 - Synced skills: X
   - <skill name 1>
   - <skill name 2>
+- Updated README: <list of updated files>
 
 You can create a PR with `/git-pr-create`.
 ```
 
 - Display "You can create a PR with `/git-pr-create`." only when a new branch was created in Step 4
 - If running on a branch other than main, display "existing" and omit the PR suggestion
+- Display "Updated README" only when README files were updated in Step 6
