@@ -1,3 +1,5 @@
+**Language:** English | [日本語](./docs/ja-JP/README.md)
+
 # shared-claude-code
 
 Shared Claude Code rules and skills for use across multiple repositories via symlinks.
