@@ -1,5 +1,7 @@
 # shared-claude-code
 
+[English](../../README.md)
+
 シンボリックリンクを使い、複数リポジトリで共有するClaude Codeのルールとスキル。
 
 ## 構成
