@@ -113,7 +113,44 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-
    - After copying, verify contents match with `diff -q`
      - If mismatch → display error
 
-### Step 6: Display Results
+### Step 6: Label Color Sync
+
+Standard label colors are defined as follows (source of truth: shared-claude-code repository):
+
+| Label name | Color code |
+|---|---|
+| `bug` | `d73a4a` |
+| `feature` | `0e8a16` |
+| `enhancement` | `a2eeef` |
+| `documentation` | `0075ca` |
+| `chore` | `ededed` |
+| `priority: high` | `b60205` |
+| `priority: medium` | `fbca04` |
+| `priority: low` | `0e8a16` |
+
+1. Get the target repository's current labels with `gh label list --json name,color`
+2. For each label in the standard table above, check if it exists in the target repository:
+   - **Not found in target**: Skip (do not create)
+   - **Color differs**: Flag as needing update
+   - **Color matches**: Mark as `✓`
+3. If all found labels match → display the following and skip to Step 7:
+   ```
+   All label colors match the standard.
+   ```
+4. If differences exist, display and ask for confirmation:
+   ```
+   ## Label Color Check
+
+   - `bug`: d73a4a → e11d48 (differs)
+   - `feature`: 0e8a16 ✓
+   - `priority: high`: b60205 ✓
+
+   Apply color corrections? (yes / skip)
+   ```
+5. If the user approves → run `gh label edit <name> --color <hex>` for each differing label
+6. If the user skips → proceed to Step 7 without changes
+
+### Step 7: Display Results
 
 Display sync results in the following format:
 
@@ -128,6 +165,8 @@ Display sync results in the following format:
 - 同期したCIテンプレート（<lang>）: X件
   - .github/workflows/ci.yml（更新）
   - tsconfig.json（新規追加）
+- Label colors corrected: X
+  - `bug`: e11d48 → d73a4a
 ```
 
-CI テンプレートを同期しなかった場合は、該当行を省略する。
+Omit the CI template line if CI templates were not synced. Omit the label color line if no label colors were corrected.
