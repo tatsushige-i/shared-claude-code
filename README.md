@@ -1,4 +1,4 @@
-# shared-claude-rules
+# shared-claude-code
 
 Shared Claude Code rules and skills for use across multiple repositories via symlinks.
 
@@ -21,12 +21,12 @@ Each consuming repository creates symlinks from `.claude/rules/` and `.claude/sk
 
 ```bash
 # From the consuming repository root
-ln -s ../../shared-claude-rules/rules/conventions.md .claude/rules/conventions.md
-ln -s ../../shared-claude-rules/rules/security.md .claude/rules/security.md
-ln -s ../../shared-claude-rules/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
-ln -s ../../shared-claude-rules/skills/git-issue-start .claude/skills/git-issue-start
-ln -s ../../shared-claude-rules/skills/git-pr-create .claude/skills/git-pr-create
-ln -s ../../shared-claude-rules/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/conventions.md
+ln -s ../../shared-claude-code/rules/security.md .claude/rules/security.md
+ln -s ../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
+ln -s ../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
+ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ```
 
 **Prerequisite**: All repositories must be in the same parent directory.

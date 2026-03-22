@@ -1,23 +1,23 @@
 ---
 name: config-github-sync
-description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-rules repository - detect diffs and copy files
+description: Sync .github files (ISSUE_TEMPLATE, workflows) from shared-claude-code repository - detect diffs and copy files
 ---
 
 # GitHub Config Sync Skill
 
-shared-claude-rulesリポジトリの `.github/` 配下の共有資材（ISSUE_TEMPLATE、workflows）を現在のプロジェクトにコピーベースで同期する。GitHubがシンボリックリンクを認識しないため、ファイルコピーで同期する。
+shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TEMPLATE、workflows）を現在のプロジェクトにコピーベースで同期する。GitHubがシンボリックリンクを認識しないため、ファイルコピーで同期する。
 
 ## 処理手順
 
 ### Step 1: 共通リポジトリの特定
 
 1. `.claude/rules/shared/` および `.claude/skills/` 配下のシンボリックリンクを探索する
-2. 見つかったシンボリックリンクの `readlink` 結果からshared-claude-rulesリポジトリのパスを解決する
-   - ルールのリンク例: `../../../shared-claude-rules/rules/conventions.md` → `shared-claude-rules` のパスを抽出
-   - スキルのリンク例: `../../shared-claude-rules/skills/git-pr-create` → `shared-claude-rules` のパスを抽出
+2. 見つかったシンボリックリンクの `readlink` 結果からshared-claude-codeリポジトリのパスを解決する
+   - ルールのリンク例: `../../../shared-claude-code/rules/conventions.md` → `shared-claude-code` のパスを抽出
+   - スキルのリンク例: `../../shared-claude-code/skills/git-pr-create` → `shared-claude-code` のパスを抽出
 3. シンボリックリンクが1つも見つからない場合 → エラーを表示して終了する:
    ```
-   エラー: shared-claude-rulesへのシンボリックリンクが見つかりません。
+   エラー: shared-claude-codeへのシンボリックリンクが見つかりません。
    最初のセットアップはREADMEの手順に従って手動で行ってください。
    ```
 4. 解決したパスに `.github/` ディレクトリが存在することを検証する

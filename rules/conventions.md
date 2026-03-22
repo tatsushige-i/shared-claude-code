@@ -112,7 +112,7 @@ When adding a new skill to `.claude/skills/`, update `.claude/skills/README.md` 
 ## Rule File Directory Structure
 
 - `.claude/rules/` root — project-specific rule files
-- `.claude/rules/shared/` — symlinks to `shared-claude-rules`
+- `.claude/rules/shared/` — symlinks to `shared-claude-code`
 
 ## Rule File Size Limit
 
