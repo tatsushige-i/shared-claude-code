@@ -30,7 +30,18 @@ docs/ja-JP/     # Japanese translations (supplementary, not authoritative)
 
 ## Adding a New Skill
 
-1. Create `skills/<category>-<object>-<verb>/SKILL.md` with YAML frontmatter (`name`, `description`)
+When adding a skill, confirm with the user whether it is a **shared skill** or a **repo-local skill**.
+
+### Shared Skill (distributed to consuming repos via symlinks)
+
+1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`)
 2. Add a symlink: `.claude/skills/<name> -> ../../skills/<name>`
 3. Update `skills/README.md` with a row in the skills table
 4. Add Japanese translation at `docs/ja-JP/skills/<name>/SKILL.md`
+
+### Repo-Local Skill (used only in this repository)
+
+Prefix the skill name with `local-` (e.g., `local-docs-validate`).
+
+1. Create `.claude/skills/local-<name>/SKILL.md` directly with YAML frontmatter (`name`, `description`)
+2. Add Japanese translation at `docs/ja-JP/local-skills/local-<name>/SKILL.md`

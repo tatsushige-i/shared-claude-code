@@ -1,5 +1,5 @@
 ---
-name: docs-validate
+name: local-docs-validate
 description: Validate documentation consistency across the repository - check skills, rules, symlinks, README structure, and translations
 ---
 

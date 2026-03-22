@@ -30,7 +30,18 @@ docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
 
 ## 新しいスキルの追加手順
 
-1. `skills/<category>-<object>-<verb>/SKILL.md` を YAML フロントマター（`name`, `description`）付きで作成
+スキル追加時、**共有スキル**か**ローカルスキル**かをユーザーに確認すること。
+
+### 共有スキル（シンボリックリンク経由で消費リポジトリに配布）
+
+1. `skills/<name>/SKILL.md` を YAML フロントマター（`name`, `description`）付きで作成
 2. シンボリックリンクを追加: `.claude/skills/<name> -> ../../skills/<name>`
 3. `skills/README.md` のスキル一覧テーブルに行を追加
 4. `docs/ja-JP/skills/<name>/SKILL.md` に日本語翻訳を追加
+
+### ローカルスキル（このリポジトリ専用）
+
+スキル名の先頭に `local-` を付与する（例: `local-docs-validate`）。
+
+1. `.claude/skills/local-<name>/SKILL.md` を YAML フロントマター（`name`, `description`）付きで直接作成（シンボリックリンク不要）
+2. `docs/ja-JP/local-skills/local-<name>/SKILL.md` に日本語翻訳を追加
