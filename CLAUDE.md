@@ -18,9 +18,10 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
 skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
   README.md     # Skills index table — must be updated when adding a skill
+ci-templates/   # CI/config templates by language — copy to consuming repos
+  nextjs/       # Next.js template (ci.yml + package.json + config files)
 .github/
   ISSUE_TEMPLATE/   # 5 issue templates (Japanese)
-  workflows/ci.yml  # CI: eol-check → lint → test → build
 docs/ja-JP/     # Japanese translations (supplementary, not authoritative)
 .claude/
   rules/        # Symlinks → ../../rules/
