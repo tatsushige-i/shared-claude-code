@@ -1,0 +1,1 @@
+../../rules/tech-debt-checklist.md
