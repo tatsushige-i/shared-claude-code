@@ -12,13 +12,13 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 ### Step 1: Check Prerequisites
 
 1. Get the current branch with `git branch --show-current`
-   - If on `main` → display "エラー: mainブランチ上ではPRを作成できません。作業ブランチに切り替えてください。" and exit
+   - If on `main` → display "Error: Cannot create a PR on the main branch. Please switch to a working branch." and exit
 2. Check for existing PRs with `gh pr list --head <branch name> --json number,url,state`
-   - If an `OPEN` PR exists → display "エラー: このブランチには既にオープンなPRがあります: <URL>" and exit
+   - If an `OPEN` PR exists → display "Error: This branch already has an open PR: <URL>" and exit
 3. Check for uncommitted changes with `git status --porcelain`
    - If changes exist → analyze the changes, stage related files individually with `git add <file path>`, generate an appropriate commit message and `git commit` (do not use `git add -A` or `git add .`; for untracked files, judge relevance to the changes and exclude unrelated ones)
 4. Verify commits exist with `git log main..HEAD --oneline`
-   - If no commits → display "エラー: mainブランチからのコミットがありません。" and exit
+   - If no commits → display "Error: No commits from the main branch." and exit
 5. Push the branch to remote:
    - Run `git push -u origin <branch name>`
    - If it fails, display the error and exit
@@ -74,8 +74,8 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 3. **Handling based on results**:
    - **Inconsistency detected**: Display a warning in the following format and continue (do not block PR creation):
      ```
-     ⚠️ ドキュメント整合性チェック:
-     - <検出内容>: <対象ドキュメント>の更新が必要な可能性があります
+     ⚠️ Documentation Consistency Check:
+     - <detection>: <target document> may need to be updated
      ```
    - **No detection patterns matched**: Proceed to Step 6 without displaying anything
 
@@ -86,13 +86,13 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 
    ```
    ## Summary
-   - <変更の要点1>
-   - <変更の要点2>
+   - <key change 1>
+   - <key change 2>
 
-   Closes #XX  ← Issue特定時のみ
+   Closes #XX  ← only when Issue is identified
 
    ## Test plan
-   - [ ] <テスト項目>
+   - [ ] <test item>
 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
@@ -100,8 +100,8 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 3. Create the PR with `gh pr create --base main --title "..." --body "..."`
    - Use a heredoc for the body to preserve formatting:
      ```
-     gh pr create --base main --title "<タイトル>" --body "$(cat <<'EOF'
-     <本文>
+     gh pr create --base main --title "<title>" --body "$(cat <<'EOF'
+     <body>
      EOF
      )"
      ```
@@ -112,12 +112,12 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 Display the creation results in the following format:
 
 ```
-## PR作成完了
+## PR Created
 
-PR #XX: <タイトル>
+PR #XX: <title>
 <PR URL>
 
-- 対応Issue: #XX <Issueタイトル>  ← Issue特定時のみ
-- 変更ファイル数: X件
-- 変更行数: +XX / -XX
+- Related Issue: #XX <Issue title>  ← only when Issue is identified
+- Files changed: X
+- Lines changed: +XX / -XX
 ```

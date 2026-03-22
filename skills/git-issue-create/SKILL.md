@@ -38,33 +38,33 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
 
    **For `feature` / `enhancement` / `bug`:**
    ```
-   ## 概要
-   <1-2文で変更の目的を説明>
+   ## Overview
+   <Describe the purpose of the change in 1-2 sentences>
 
-   ## 背景・動機
-   <なぜこの変更が必要か>
+   ## Background & Motivation
+   <Why is this change needed>
 
-   ## 実装方針
-   <技術的なアプローチの概要>
+   ## Implementation Approach
+   <Technical approach overview>
 
-   ## 受け入れ条件
-   - [ ] <条件1>
-   - [ ] <条件2>
+   ## Acceptance Criteria
+   - [ ] <criteria 1>
+   - [ ] <criteria 2>
 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
    **For `documentation` / `chore`:**
    ```
-   ## 概要
-   <1-2文で変更の目的を説明>
+   ## Overview
+   <Describe the purpose of the change in 1-2 sentences>
 
-   ## 背景・動機
-   <なぜこの変更が必要か>
+   ## Background & Motivation
+   <Why is this change needed>
 
-   ## 受け入れ条件
-   - [ ] <条件1>
-   - [ ] <条件2>
+   ## Acceptance Criteria
+   - [ ] <criteria 1>
+   - [ ] <criteria 2>
 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
@@ -74,17 +74,17 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
 Display a preview in the following format and obtain user approval:
 
 ```
-## Issueプレビュー
+## Issue Preview
 
-**タイトル**: <タイトル>
-**種類ラベル**: <ラベル>
-**優先度ラベル**: <ラベル>
+**Title**: <title>
+**Type Label**: <label>
+**Priority Label**: <label>
 
 ---
-<本文>
+<body>
 ---
 
-この内容でIssueを作成してよろしいですか？修正点があればお知らせください。
+Shall I create the Issue with this content? Let me know if you'd like any changes.
 ```
 
 - If the user approves → proceed to Step 4
@@ -94,8 +94,8 @@ Display a preview in the following format and obtain user approval:
 
 1. Create the Issue using `gh issue create`:
    ```
-   gh issue create --title "<タイトル>" --label "<種類ラベル>" --label "<優先度ラベル>" --body "$(cat <<'EOF'
-   <本文>
+   gh issue create --title "<title>" --label "<type label>" --label "<priority label>" --body "$(cat <<'EOF'
+   <body>
    EOF
    )"
    ```
@@ -106,11 +106,11 @@ Display a preview in the following format and obtain user approval:
 Display the creation results in the following format:
 
 ```
-## Issue作成完了
+## Issue Created
 
-Issue #XX: <タイトル>
+Issue #XX: <title>
 <Issue URL>
 
-- 種類ラベル: <種類ラベル>
-- 優先度ラベル: <優先度ラベル>
+- Type Label: <type label>
+- Priority Label: <priority label>
 ```
