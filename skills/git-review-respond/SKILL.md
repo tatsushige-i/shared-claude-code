@@ -15,11 +15,11 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 - If `$ARGUMENTS` is specified as a number, use that PR number
 - If not specified or not a number, ask the user for the PR number:
   ```
-  対応するPRの番号を教えてください。
+  Please provide the PR number you'd like to address.
   ```
 - If a clear number cannot be determined from the user's response, exit with an error. Do not guess or make ambiguous interpretations:
   ```
-  エラー: PR番号を特定できませんでした。数値で指定してください。
+  Error: Could not identify the PR number. Please specify a number.
   ```
 
 ### Step 2: Fetch PR Information and Switch Branch
@@ -28,14 +28,14 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 2. If the command fails (no PR exists for the given number):
    - Check if it exists as an Issue with `gh issue view <PR number>`, and if it's an Issue, display the following and exit:
      ```
-     エラー: #XX はIssueです。PRの番号を指定してください。
+     Error: #XX is an Issue. Please specify a PR number.
      ```
    - If it's not an Issue either, display the following and exit:
      ```
-     エラー: PR #XX は存在しません。
+     Error: PR #XX does not exist.
      ```
 3. Check the PR's `state`:
-   - If not `OPEN` → warn with "このPRは既にクローズ/マージされています" and exit
+   - If not `OPEN` → warn with "This PR is already closed/merged." and exit
 4. Checkout the PR's `headRefName` branch:
    - Run `git checkout <headRefName>`
    - Pull the latest from remote with `git pull`
@@ -71,7 +71,7 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
    - Comments with `in_reply_to_id` set (reply comments)
    - Comments belonging to resolved threads
 
-4. If 0 target comments remain → display "対応すべきレビューコメントはありません" and exit
+4. If 0 target comments remain → display "There are no review comments to address." and exit
 
 ### Step 4: Analyze and Classify Each Comment
 
@@ -105,27 +105,27 @@ After applying these criteria, classify each comment into one of the following:
 Display the classification results in the following format and wait for user approval:
 
 ```
-## PRレビューコメント分析結果
+## PR Review Comment Analysis
 
-PR #XX: <タイトル>
-対象コメント: X件
+PR #XX: <title>
+Target comments: X
 
-### 要修正 (X件)
+### Needs fix (X)
 1. `path/to/file.ts:L42` - @reviewer
-   > コメント内容の要約
-   → 修正方針: ～を変更する
+   > Summary of comment
+   → Fix approach: change ~
 
-### 要説明 (X件)
+### Needs response (X)
 1. `path/to/file.ts:L10` - @reviewer
-   > コメント内容の要約
-   → 回答方針: ～について説明する
+   > Summary of comment
+   → Response approach: explain ~
 
-### 対応不要 (X件)
+### No action needed (X)
 1. `path/to/file.ts:L5` - @reviewer
-   > コメント内容の要約
-   → 理由: 称賛コメント
+   > Summary of comment
+   → Reason: praise comment
 
-この内容で対応を進めてよいですか？
+Shall I proceed with these?
 ```
 
 **Wait for user approval before proceeding to the next step.** If the user changes the classification or approach, follow their direction.
@@ -163,12 +163,12 @@ Reply to each comment using `gh api`. Post replies in the same thread as the ori
 ```
 gh api repos/{owner}/{repo}/pulls/<PR number>/comments \
   -method POST \
-  -f body="<返信内容>" \
-  -F in_reply_to=<元コメントのID>
+  -f body="<reply body>" \
+  -F in_reply_to=<original comment ID>
 ```
 
 Reply content guidelines:
-- **Needs fix (fixed)**: Briefly explain the fix (e.g., "修正しました。`xxx` を `yyy` に変更しています。")
+- **Needs fix (fixed)**: Briefly explain the fix (e.g., "Fixed. Changed `xxx` to `yyy`.")
 - **Needs response**: Write the answer to the question
 - **No action needed**: Explain the reason if needed, or reply with thanks
 
@@ -185,15 +185,15 @@ Write replies in Japanese (when the reviewer uses Japanese). If the review comme
 Display the results in the following format:
 
 ```
-## 完了サマリー
+## Completion Summary
 
-PR #XX: <タイトル>
+PR #XX: <title>
 <PR URL>
 
-- 修正済み: X件
-- 説明返信: X件
-- 対応不要: X件
-- スキップ: X件（理由: ファイル削除済みなど）
+- Fixed: X
+- Explained: X
+- No action needed: X
+- Skipped: X (reason: file deleted, etc.)
 
-コミット: <コミットハッシュ>
+Commit: <commit hash>
 ```

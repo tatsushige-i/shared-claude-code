@@ -17,8 +17,8 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
    - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
    ```
-   エラー: shared-claude-codeへのシンボリックリンクが見つかりません。
-   最初のセットアップはREADMEの手順に従って手動で行ってください。
+   Error: No symlinks to shared-claude-code found.
+   Initial setup must be done manually following the README instructions.
    ```
 4. Verify that `rules/` and `skills/` directories exist at the resolved path
    - If they do not exist → display error and exit
@@ -35,21 +35,21 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 
 1. If everything is already synced → display the following and exit:
    ```
-   すべてのルール・スキルは同期済みです。
+   All rules and skills are already synced.
    ```
 2. If there are missing items, display in the following format:
    ```
-   ## 未同期の項目
+   ## Unsynced Items
 
-   ### ルール
+   ### Rules
    - conventions.md
    - security.md
 
-   ### スキル
+   ### Skills
    - git-branch-cleanup
    - git-issue-create
 
-   上記の項目を同期しますか？除外したい項目があればお知らせください。
+   Would you like to sync these items? Let me know if you want to exclude any.
    ```
 3. Branch based on the user's response:
    - Full approval → sync all items
@@ -63,7 +63,7 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
    - Check for uncommitted changes with `git status --porcelain`
      - If changes exist → display error and exit:
        ```
-       エラー: mainブランチに未コミットの変更があります。変更をコミットまたはスタッシュしてから再実行してください。
+       Error: There are uncommitted changes on the main branch. Please commit or stash the changes and run again.
        ```
    - Check if a branch with the same name exists with `git branch --list chore/sync-claude-rules`
      - If it does not exist → create branch with `git checkout -b chore/sync-claude-rules`
@@ -93,19 +93,19 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 Display sync results in the following format:
 
 ```
-## 同期完了
+## Sync Complete
 
-- ブランチ: <ブランチ名>（新規作成 / 既存）
-- コミット: <コミットハッシュ短縮>
-- 同期したルール: X件
-  - <ファイル名1>
-  - <ファイル名2>
-- 同期したスキル: X件
-  - <スキル名1>
-  - <スキル名2>
+- Branch: <branch name> (newly created / existing)
+- Commit: <short commit hash>
+- Synced rules: X
+  - <filename 1>
+  - <filename 2>
+- Synced skills: X
+  - <skill name 1>
+  - <skill name 2>
 
-`/git-pr-create` でPRを作成できます。
+You can create a PR with `/git-pr-create`.
 ```
 
-- Display "`/git-pr-create` でPRを作成できます。" only when a new branch was created in Step 4
-- If running on a branch other than main, display "既存" and omit the PR suggestion
+- Display "You can create a PR with `/git-pr-create`." only when a new branch was created in Step 4
+- If running on a branch other than main, display "existing" and omit the PR suggestion
