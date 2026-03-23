@@ -96,4 +96,6 @@ If not defined, or if the Issue's type label is not a scaffold target, skip this
    <Issue本文>
 
    上記のIssue内容に基づいて実装計画を策定します。
+
+   **実装完了後の注意**: 実装が完了したら `git diff --stat` および主要な差分をユーザーに提示し、問題がなければ `/git-pr-create` でPRを作成するよう案内すること。コミットは `/git-pr-create` のフローに委ねる。
    ```
