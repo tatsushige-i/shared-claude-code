@@ -108,24 +108,36 @@ If new skills were synced in Step 5, update documentation files that list skills
    - If the file does not exist → skip this step
 2. Read the project's `.claude/settings.json`
    - If it does not exist → treat as `{}`
-3. For each hook entry in `shared-hooks.json`, check for duplicates:
+3. For each hook entry in `shared-hooks.json`, check for duplicates using three possible states:
    - The file structure mirrors the `settings.json` `hooks` section; each hook entry carries `_id`, `_description`, and `_detect_by` metadata fields
    - For entries with a `matcher`: search existing hooks of the same event key + `matcher`
    - For entries without a `matcher` (e.g., Stop): search all existing hooks under that event key
-   - If any existing hook's `command` matches the `_detect_by` regex pattern → consider it "already present"
+   - If any existing hook's `command` matches the `_detect_by` regex pattern:
+     - Compare the matched hook's `command` with the shared hook's `command`
+     - If identical → consider it "already synced" (skip)
+     - If different → mark as "to be updated" (command has changed)
    - If no match is found → mark as "to be added"
-4. If there are hooks to add, present them to the user and confirm:
+4. If there are hooks to add or update, present them to the user and confirm:
    ```
    ## Unsynced Hooks
+
+   ### New
    - block-force-push (PreToolUse/Bash): Block git force push
+
+   ### Updated
    - notify-stop (Stop): macOS notification on task completion
+     Before: osascript -e 'display notification "...(old command)..."'
+     After:  REPO=$(basename ...); osascript -e "display notification \"$REPO の作業が完了しました\" ..."
 
    Would you like to sync these hooks? Let me know if you want to exclude any.
    ```
-   - If all hooks are already present → display `All hooks are already synced.` and skip to Step 7
-5. Add the approved hooks to `.claude/settings.json`:
-   - Strip `_id`, `_description`, and `_detect_by` fields before inserting
-   - Merge into the existing `hooks` object by event/matcher (do not overwrite existing entries)
+   - Omit the `### New` section if there are no additions
+   - Omit the `### Updated` section if there are no updates
+   - If all hooks are already synced → display `All hooks are already synced.` and skip to Step 7
+5. Apply the approved hooks to `.claude/settings.json`:
+   - Strip `_id`, `_description`, and `_detect_by` fields before inserting/updating
+   - **For "to be added" hooks**: merge into the existing `hooks` object by event/matcher (do not overwrite existing entries)
+   - **For "to be updated" hooks**: overwrite the matched existing hook entry with the new `command`
    - If `.claude/settings.json` does not exist → create it with only the hooks structure
    - If the `hooks` key is absent → add it
 6. Stage the file: `git add .claude/settings.json`
@@ -156,8 +168,8 @@ Display sync results in the following format:
   - <skill name 1>
   - <skill name 2>
 - Synced hooks: X
-  - <hook id 1>
-  - <hook id 2>
+  - <hook id 1> (new)
+  - <hook id 2> (updated)
 - Updated README: <list of updated files>
 
 You can create a PR with `/git-pr-create`.
@@ -166,4 +178,4 @@ You can create a PR with `/git-pr-create`.
 - Display "You can create a PR with `/git-pr-create`." only when a new branch was created in Step 4
 - If running on a branch other than main, display "existing" and omit the PR suggestion
 - Display "Updated README" only when README files were updated in Step 6
-- Display "Synced hooks" only when hooks were added in Step 6b
+- Display "Synced hooks" only when hooks were added or updated in Step 6b; append `(new)` or `(updated)` per entry
