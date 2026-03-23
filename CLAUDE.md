@@ -22,9 +22,12 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
 skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
   README.md     # Skills index table — must be updated when adding a skill
+hooks/
+  shared-hooks.json  # Common hook definitions — merged into .claude/settings.json of consuming repos via config-claude-sync
 .claude/
   rules/        # Symlinks → ../../rules/
   skills/       # Symlinks → ../../skills/
+  settings.json # Hook configuration for this repository
 ci-templates/   # CI/config templates by language — copied to consuming repos via /config-github-sync
   nextjs/       # Next.js template (ESLint, Jest, TypeScript configs)
 .github/
@@ -60,3 +63,18 @@ Prefix the skill name with `local-` (e.g., `local-docs-validate`).
 1. Create `rules/<name>.md`
 2. Add a symlink: `.claude/rules/<name>.md -> ../../rules/<name>.md`
 3. Add Japanese translation at `docs/ja-JP/rules/<name>.md`
+
+## Adding a New Hook
+
+### Shared Hook (distributed to consuming repos via `config-claude-sync`)
+
+Criteria: project-agnostic and reusable across any project.
+
+1. Add an entry to `hooks/shared-hooks.json` (mirrors `settings.json` `hooks` structure; include `_id`, `_description`, `_detect_by` metadata fields)
+2. Add the same hook to `.claude/settings.json` in this repository
+
+### Repo-Local Hook (used only in this repository)
+
+Criteria: specific to this repository's file structure, tools, or workflows.
+
+1. Add only to `.claude/settings.json`

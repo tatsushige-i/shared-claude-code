@@ -102,12 +102,41 @@ If new skills were synced in Step 5, update documentation files that list skills
      - Stage the file with `git add CLAUDE.md`
    - If `CLAUDE.md` does not exist or does not contain a skills listing: skip
 
+### Step 6b: Sync Shared Hooks
+
+1. Read `hooks/shared-hooks.json` from the shared-claude-code repository
+   - If the file does not exist → skip this step
+2. Read the project's `.claude/settings.json`
+   - If it does not exist → treat as `{}`
+3. For each hook entry in `shared-hooks.json`, check for duplicates:
+   - The file structure mirrors the `settings.json` `hooks` section; each hook entry carries `_id`, `_description`, and `_detect_by` metadata fields
+   - For entries with a `matcher`: search existing hooks of the same event key + `matcher`
+   - For entries without a `matcher` (e.g., Stop): search all existing hooks under that event key
+   - If any existing hook's `command` matches the `_detect_by` regex pattern → consider it "already present"
+   - If no match is found → mark as "to be added"
+4. If there are hooks to add, present them to the user and confirm:
+   ```
+   ## Unsynced Hooks
+   - block-force-push (PreToolUse/Bash): Block git force push
+   - notify-stop (Stop): macOS notification on task completion
+
+   Would you like to sync these hooks? Let me know if you want to exclude any.
+   ```
+   - If all hooks are already present → display `All hooks are already synced.` and skip to Step 7
+5. Add the approved hooks to `.claude/settings.json`:
+   - Strip `_id`, `_description`, and `_detect_by` fields before inserting
+   - Merge into the existing `hooks` object by event/matcher (do not overwrite existing entries)
+   - If `.claude/settings.json` does not exist → create it with only the hooks structure
+   - If the `hooks` key is absent → add it
+6. Stage the file: `git add .claude/settings.json`
+
 ### Step 7: Commit
 
 1. Stage the symlinks created in Step 5 individually (do not use `git add -A` or `git add .`):
    - Rules: `git add .claude/rules/shared/<name>.md`
    - Skills: `git add .claude/skills/<name>`
    - README files staged in Step 6 are already included
+   - `settings.json` staged in Step 6b is already included
 2. Commit with `git commit -m "chore: sync shared claude rules and skills"`
 3. If the commit fails (e.g., no staged files), display a warning and proceed to Step 8
 
@@ -126,6 +155,9 @@ Display sync results in the following format:
 - Synced skills: X
   - <skill name 1>
   - <skill name 2>
+- Synced hooks: X
+  - <hook id 1>
+  - <hook id 2>
 - Updated README: <list of updated files>
 
 You can create a PR with `/git-pr-create`.
@@ -134,3 +166,4 @@ You can create a PR with `/git-pr-create`.
 - Display "You can create a PR with `/git-pr-create`." only when a new branch was created in Step 4
 - If running on a branch other than main, display "existing" and omit the PR suggestion
 - Display "Updated README" only when README files were updated in Step 6
+- Display "Synced hooks" only when hooks were added in Step 6b
