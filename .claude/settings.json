@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude が承認を待っています\" with title \"Claude Code\"'"
+            "command": "REPO=$(basename $(git rev-parse --show-toplevel 2>/dev/null || pwd)); osascript -e \"display notification \\\"$REPO が承認を待っています\\\" with title \\\"Claude Code\\\"\""
           }
         ]
       }
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claudeの作業が完了しました\" with title \"Claude Code\"'"
+            "command": "REPO=$(basename $(git rev-parse --show-toplevel 2>/dev/null || pwd)); osascript -e \"display notification \\\"$REPO の作業が完了しました\\\" with title \\\"Claude Code\\\"\""
           }
         ]
       }
