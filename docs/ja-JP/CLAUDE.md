@@ -22,9 +22,12 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 rules/          # マスタールールファイル（英語） — 消費リポジトリの .claude/rules/ にシンボリックリンク
 skills/         # マスタースキル定義 — 消費リポジトリの .claude/skills/ にシンボリックリンク
   README.md     # スキル一覧テーブル — スキル追加時に更新必須
+hooks/
+  shared-hooks.json  # 共通hooks定義 — config-claude-sync で消費リポジトリの .claude/settings.json にマージ
 .claude/
   rules/        # シンボリックリンク → ../../rules/
   skills/       # シンボリックリンク → ../../skills/
+  settings.json # このリポジトリ用のhook設定
 ci-templates/   # 言語別CIテンプレート — /config-github-sync によるファイルコピーで消費リポジトリに配布
   nextjs/       # Next.js テンプレート（ESLint, Jest, TypeScript設定）
 .github/
@@ -60,3 +63,18 @@ docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
 1. `rules/<name>.md` を作成
 2. シンボリックリンクを追加: `.claude/rules/<name>.md -> ../../rules/<name>.md`
 3. `docs/ja-JP/rules/<name>.md` に日本語翻訳を追加
+
+## 新しいHookの追加手順
+
+### 共通Hook（`config-claude-sync` で消費リポジトリに配布）
+
+**判断基準**: プロジェクト非依存で、どのプロジェクトでも汎用的に使えるhook。
+
+1. `hooks/shared-hooks.json` にエントリを追加する（`settings.json` の `hooks` 構造に準拠し、`_id`・`_description`・`_detect_by` メタデータフィールドを含める）
+2. このリポジトリの `.claude/settings.json` にも同じhookを追加する
+
+### リポジトリ固有Hook（このリポジトリのみで使用）
+
+**判断基準**: このリポジトリのファイル構成・ツール・ワークフローに固有のhook。
+
+1. `.claude/settings.json` にのみ追加する

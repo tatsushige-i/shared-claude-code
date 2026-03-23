@@ -1,0 +1,55 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "_id": "block-force-push",
+          "_description": "Block git force push",
+          "_detect_by": "force|push.*-f|block-dangerous",
+          "type": "command",
+          "command": "if echo \"$TOOL_INPUT\" | grep -qE 'push\\s+(-f|--force)'; then echo 'BLOCK: force pushは禁止されています' >&2; exit 2; fi"
+        }
+      ]
+    },
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "_id": "block-env-staging",
+          "_description": "Block .env file git staging",
+          "_detect_by": "\\.env|block-dangerous",
+          "type": "command",
+          "command": "if echo \"$TOOL_INPUT\" | grep -qE 'git\\s+add.*\\.env'; then echo 'BLOCK: .envファイルのステージングは禁止されています' >&2; exit 2; fi"
+        }
+      ]
+    }
+  ],
+  "Notification": [
+    {
+      "matcher": "permission_prompt",
+      "hooks": [
+        {
+          "_id": "notify-permission-prompt",
+          "_description": "macOS notification for permission prompts",
+          "_detect_by": "osascript|permission_prompt",
+          "type": "command",
+          "command": "osascript -e 'display notification \"Claude が承認を待っています\" with title \"Claude Code\"'"
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "_id": "notify-stop",
+          "_description": "macOS notification on task completion",
+          "_detect_by": "osascript",
+          "type": "command",
+          "command": "osascript -e 'display notification \"Claudeの作業が完了しました\" with title \"Claude Code\"'"
+        }
+      ]
+    }
+  ]
+}
