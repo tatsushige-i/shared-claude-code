@@ -5,7 +5,7 @@ description: Sync .github files and ci-templates from shared-claude-code reposit
 
 # GitHub Config Sync Skill
 
-shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TEMPLATE、workflows）を現在のプロジェクトにコピーベースで同期する。GitHubがシンボリックリンクを認識しないため、ファイルコピーで同期する。
+shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TEMPLATE、PULL_REQUEST_TEMPLATE、workflows）を現在のプロジェクトにコピーベースで同期する。GitHubがシンボリックリンクを認識しないため、ファイルコピーで同期する。
 
 ## 処理手順
 
@@ -25,7 +25,7 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
 
 ### Step 2: 差分の検出
 
-1. shared側の `.github/ISSUE_TEMPLATE/` と `.github/workflows/` を走査する
+1. shared側の `.github/ISSUE_TEMPLATE/`、`.github/PULL_REQUEST_TEMPLATE.md`、`.github/workflows/` を走査する
 2. ローカルの対応ファイルと比較し、各ファイルの状態を判定する:
    - **同一**: 内容が一致（`diff -q` で判定）
    - **差分あり**: 両方に存在するが内容が異なる
@@ -47,6 +47,9 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
    - chore.yml — ローカルに存在しない（新規追加）
    - enhancement.yml — 差分あり
 
+   ### PULL_REQUEST_TEMPLATE
+   - PULL_REQUEST_TEMPLATE.md — 差分あり
+
    ### workflows
    - ci.yml — 差分あり
 
@@ -60,7 +63,7 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
 
 ### Step 4: ファイルコピー
 
-1. `.github/ISSUE_TEMPLATE/` や `.github/workflows/` ディレクトリが存在しない場合は `mkdir -p` で作成する
+1. `.github/ISSUE_TEMPLATE/` や `.github/workflows/` ディレクトリが存在しない場合は `mkdir -p` で作成する。`PULL_REQUEST_TEMPLATE.md` は `.github/` が存在することを確認する。
 2. 選択された項目を `cp` で上書きコピーする
 3. コピー後、`diff -q` で内容が一致することを検証する
    - 不一致の場合 → エラーを表示する
@@ -160,6 +163,7 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
 - 同期したISSUE_TEMPLATE: X件
   - <ファイル名1>（新規追加）
   - <ファイル名2>（更新）
+- 同期したPULL_REQUEST_TEMPLATE: （新規追加 or 更新）
 - 同期したワークフロー: X件
   - <ファイル名1>（更新）
 - 同期したCIテンプレート（<lang>）: X件
