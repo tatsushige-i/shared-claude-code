@@ -31,6 +31,17 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$TOOL_INPUT\" | jq -r '.file_path // empty'); if [ -z \"$FILE\" ] || [ ! -f \"$FILE\" ]; then exit 0; fi; if [ -f package.json ] && command -v npx >/dev/null 2>&1; then npx --no-install prettier --write \"$FILE\" 2>/dev/null || npx --no-install @biomejs/biome format --write \"$FILE\" 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
