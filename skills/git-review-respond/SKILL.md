@@ -14,11 +14,14 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 
 - If `$ARGUMENTS` is specified as a number, use that PR number
 - If not specified or not a number, ask the user for the PR number:
-  ```
+
+  ```text
   Please provide the PR number you'd like to address.
   ```
+
 - If a clear number cannot be determined from the user's response, exit with an error. Do not guess or make ambiguous interpretations:
-  ```
+
+  ```text
   Error: Could not identify the PR number. Please specify a number.
   ```
 
@@ -27,13 +30,17 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 1. Fetch PR information with `gh pr view <PR number> --json state,headRefName,number,title,url`
 2. If the command fails (no PR exists for the given number):
    - Check if it exists as an Issue with `gh issue view <PR number>`, and if it's an Issue, display the following and exit:
-     ```
+
+     ```text
      Error: #XX is an Issue. Please specify a PR number.
      ```
+
    - If it's not an Issue either, display the following and exit:
-     ```
+
+     ```text
      Error: PR #XX does not exist.
      ```
+
 3. Check the PR's `state`:
    - If not `OPEN` → warn with "This PR is already closed/merged." and exit
 4. Checkout the PR's `headRefName` branch:
@@ -43,11 +50,13 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 ### Step 3: Fetch and Filter Review Comments
 
 1. Fetch review comments via REST API:
-   ```
+
+   ```bash
    gh api repos/{owner}/{repo}/pulls/<PR number>/comments --paginate
    ```
 
 2. Fetch resolved thread comment IDs via GraphQL API:
+
    ```graphql
    query {
      repository(owner: "{owner}", name: "{repo}") {
@@ -76,6 +85,7 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 ### Step 4: Analyze and Classify Each Comment
 
 For each target comment, review the following information:
+
 - `path`: Target file path
 - `line` / `original_line`: Target line
 - `diff_hunk`: Diff context
@@ -104,7 +114,7 @@ After applying these criteria, classify each comment into one of the following:
 
 Display the classification results in the following format and wait for user approval:
 
-```
+```text
 ## PR Review Comment Analysis
 
 PR #XX: <title>
@@ -148,10 +158,12 @@ If any check fails, fix the issue and re-run.
 
 1. Stage changed files individually with `git add <file path>` (do not use `git add .`)
 2. Commit with the following format:
-   ```
+
+   ```text
    fix: address PR #<PR number> review comments
    ```
-   * Include Co-Authored-By
+
+   - Include Co-Authored-By
 3. Push to remote with `git push`
 
 **Note**: If there are no "Needs fix" comments and no code changes, skip this step.
@@ -160,7 +172,7 @@ If any check fails, fix the issue and re-run.
 
 Reply to each comment using `gh api`. Post replies in the same thread as the original comment:
 
-```
+```bash
 gh api repos/{owner}/{repo}/pulls/<PR number>/comments \
   -method POST \
   -f body="<reply body>" \
@@ -168,6 +180,7 @@ gh api repos/{owner}/{repo}/pulls/<PR number>/comments \
 ```
 
 Reply content guidelines:
+
 - **Needs fix (fixed)**: Briefly explain the fix (e.g., "Fixed. Changed `xxx` to `yyy`.")
 - **Needs response**: Write the answer to the question
 - **No action needed**: Explain the reason if needed, or reply with thanks
@@ -176,7 +189,7 @@ Write replies in Japanese (when the reviewer uses Japanese). If the review comme
 
 **Signature**: Append the following signature at the end of each reply body:
 
-```
+```text
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
@@ -184,7 +197,7 @@ Write replies in Japanese (when the reviewer uses Japanese). If the review comme
 
 Display the results in the following format:
 
-```
+```text
 ## Completion Summary
 
 PR #XX: <title>

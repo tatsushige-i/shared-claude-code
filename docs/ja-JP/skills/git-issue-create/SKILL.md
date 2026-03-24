@@ -37,7 +37,8 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 2. **本文**: 日本語で、種類ラベルに応じたテンプレートで生成する:
 
    **`feature` / `enhancement` / `bug` の場合:**
-   ```
+
+   ```markdown
    ## 概要
    <1-2文で変更の目的を説明>
 
@@ -55,7 +56,8 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    ```
 
    **`documentation` / `chore` の場合:**
-   ```
+
+   ```markdown
    ## 概要
    <1-2文で変更の目的を説明>
 
@@ -73,7 +75,7 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 
 以下の形式でプレビューを表示し、ユーザーの承認を得る:
 
-```
+```text
 ## Issueプレビュー
 
 **タイトル**: <タイトル>
@@ -93,19 +95,21 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 ### Step 4: Issue作成
 
 1. `gh issue create` でIssueを作成する:
-   ```
+
+   ```bash
    gh issue create --title "<タイトル>" --label "<種類ラベル>" --label "<優先度ラベル>" --body "$(cat <<'EOF'
    <本文>
    EOF
    )"
    ```
+
 2. 失敗した場合はエラーメッセージを表示して終了する
 
 ### Step 5: 結果表示
 
 作成結果を以下の形式で表示する:
 
-```
+```text
 ## Issue作成完了
 
 Issue #XX: <タイトル>

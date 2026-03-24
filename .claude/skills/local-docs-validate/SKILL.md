@@ -54,11 +54,14 @@ Verify that the following core translation files exist:
 ### Step 5: Present Findings
 
 1. If no issues were found in any category → display:
-   ```
+
+   ```text
    All documentation consistency checks passed.
    ```
+
 2. If issues were found → display results by category:
-   ```
+
+   ```text
    ## Documentation Consistency Check Results
 
    ### Skills Integrity
@@ -76,6 +79,7 @@ Verify that the following core translation files exist:
 
    Auto-fixable items are available. Apply fixes? (all / select / skip)
    ```
+
 3. Wait for user response before proceeding
 
 ### Step 6: Apply Fixes
@@ -83,16 +87,18 @@ Verify that the following core translation files exist:
 Based on the user's response, apply fixes:
 
 **Auto-fixable** (apply with user approval):
+
 - **Missing symlink**: Create with `ln -s ../../skills/<name> .claude/skills/<name>`, then verify with `readlink`
-- **Missing skills/README.md entry**: Read `name` and `description` from `skills/<name>/SKILL.md` frontmatter, generate a table row in the format `| \`<name>\` | \`/<name>\` | <description> |`, and append it to the table in `skills/README.md`
+- **Missing skills/README.md entry**: Read `name` and `description` from `skills/<name>/SKILL.md` frontmatter, generate a table row in the format `| \`<name>\` | \`/<name>\` | <description> |`, and append it to the table in`skills/README.md`
 
 **Manual fix required** (display warning only):
+
 - **Structure section mismatch**: Display which files need updating and which skills are missing/extra
 - **Missing Japanese translation**: Display which files need to be created
 
 Display results after applying fixes:
 
-```
+```text
 ## Fixes Applied
 
 - Created symlink: .claude/skills/config-github-sync
