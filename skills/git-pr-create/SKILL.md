@@ -51,11 +51,11 @@ Search for the Issue automatically in the following order (do not ask the user):
 
    | Prefix         | PR Title Prefix |
    |----------------|-----------------|
-   | `bugfix/`      | `fix: `         |
-   | `feature/`     | `feat: `        |
-   | `enhance/`     | `enhance: `     |
-   | `docs/`        | `docs: `        |
-   | `chore/`       | `chore: `       |
+   | `bugfix/`      | `fix:`         |
+   | `feature/`     | `feat:`        |
+   | `enhance/`     | `enhance:`     |
+   | `docs/`        | `docs:`        |
+   | `chore/`       | `chore:`       |
 
 ### Step 5: Documentation Consistency Check
 
@@ -73,10 +73,12 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 
 3. **Handling based on results**:
    - **Inconsistency detected**: Display a warning in the following format and continue (do not block PR creation):
-     ```
+
+     ```text
      ⚠️ Documentation Consistency Check:
      - <detection>: <target document> may need to be updated
      ```
+
    - **No detection patterns matched**: Proceed to Step 6 without displaying anything
 
 ### Step 6: Create PR
@@ -84,7 +86,7 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 1. Generate a PR title (70 characters or less, using the prefix inferred in Step 4)
 2. Generate the PR body using the following template:
 
-   ```
+   ```markdown
    ## Summary
    - <key change 1>
    - <key change 2>
@@ -99,19 +101,21 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
 
 3. Create the PR with `gh pr create --base main --title "..." --body "..."`
    - Use a heredoc for the body to preserve formatting:
-     ```
+
+     ```bash
      gh pr create --base main --title "<title>" --body "$(cat <<'EOF'
      <body>
      EOF
      )"
      ```
+
 4. If it fails, display the error message and exit
 
 ### Step 7: Display Results
 
 Display the creation results in the following format:
 
-```
+```text
 ## PR Created
 
 PR #XX: <title>

@@ -14,11 +14,14 @@ Automate the workflow from GitHub Issue information retrieval, label validation,
 
 - If `$ARGUMENTS` is specified as a number, use that Issue number
 - If not specified or not a number, ask the user for the Issue number:
-  ```
+
+  ```text
   対応するIssueの番号を教えてください。
   ```
+
 - If a clear number cannot be determined from the user's response, exit with an error. Do not guess or make ambiguous interpretations:
-  ```
+
+  ```text
   エラー: Issue番号を特定できませんでした。数値で指定してください。
   ```
 
@@ -27,16 +30,21 @@ Automate the workflow from GitHub Issue information retrieval, label validation,
 1. Fetch Issue information with `gh issue view <Issue number> --json number,title,body,labels,state`
 2. If the command fails (no Issue exists for the given number):
    - Check if it exists as a PR with `gh pr view <Issue number>`, and if it's a PR, display the following and exit:
-     ```
+
+     ```text
      エラー: #XX はPRです。Issueの番号を指定してください。
      ```
+
    - If it's not a PR either, display the following and exit:
-     ```
+
+     ```text
      エラー: Issue #XX は存在しません。
      ```
+
 3. If `state` is not `OPEN` → warn with "このIssueは既にクローズされています" and exit
 4. Display the fetched information in the following format:
-   ```
+
+   ```text
    ## Issue #XX: <タイトル>
 
    ラベル: <ラベル一覧>
@@ -86,7 +94,8 @@ If not defined, or if the Issue's type label is not a scaffold target, skip this
 
 1. Call the `EnterPlanMode` tool to transition to Plan Mode
 2. Display the following message to prompt implementation planning:
-   ```
+
+   ```text
    Plan Modeに移行しました。Issue #XX の実装計画を策定します。
 
    ## Issue情報

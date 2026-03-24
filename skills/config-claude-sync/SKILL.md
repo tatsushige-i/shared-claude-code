@@ -16,10 +16,12 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
    - Rule link example: `../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
    - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
-   ```
+
+   ```text
    Error: No symlinks to shared-claude-code found.
    Initial setup must be done manually following the README instructions.
    ```
+
 4. Verify that `rules/` and `skills/` directories exist at the resolved path
    - If they do not exist → display error and exit
 
@@ -34,11 +36,14 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 ### Step 3: Present Differences and Confirm with User
 
 1. If everything is already synced → display the following and exit:
-   ```
+
+   ```text
    All rules and skills are already synced.
    ```
+
 2. If there are missing items, display in the following format:
-   ```
+
+   ```text
    ## Unsynced Items
 
    ### Rules
@@ -51,6 +56,7 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 
    Would you like to sync these items? Let me know if you want to exclude any.
    ```
+
 3. Branch based on the user's response:
    - Full approval → sync all items
    - Partial exclusion → exclude the specified items and sync the rest
@@ -62,9 +68,11 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 3. **If on main**:
    - Check for uncommitted changes with `git status --porcelain`
      - If changes exist → display error and exit:
-       ```
+
+       ```text
        Error: There are uncommitted changes on the main branch. Please commit or stash the changes and run again.
        ```
+
    - Check if a branch with the same name exists with `git branch --list chore/sync-claude-rules`
      - If it does not exist → create branch with `git checkout -b chore/sync-claude-rules`
      - If it exists → create branch with `git checkout -b chore/sync-claude-rules-YYYYMMDD` (current date)
@@ -118,7 +126,8 @@ If new skills were synced in Step 5, update documentation files that list skills
      - If different → mark as "to be updated" (command has changed)
    - If no match is found → mark as "to be added"
 4. If there are hooks to add or update, present them to the user and confirm:
-   ```
+
+   ```text
    ## Unsynced Hooks
 
    ### New
@@ -131,6 +140,7 @@ If new skills were synced in Step 5, update documentation files that list skills
 
    Would you like to sync these hooks? Let me know if you want to exclude any.
    ```
+
    - Omit the `### New` section if there are no additions
    - Omit the `### Updated` section if there are no updates
    - If all hooks are already synced → display `All hooks are already synced.` and skip to Step 7
@@ -156,7 +166,7 @@ If new skills were synced in Step 5, update documentation files that list skills
 
 Display sync results in the following format:
 
-```
+```text
 ## Sync Complete
 
 - Branch: <branch name> (newly created / existing)

@@ -51,11 +51,11 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
    | プレフィックス | PRタイトルのプレフィックス |
    |----------------|---------------------------|
-   | `bugfix/`      | `fix: `                   |
-   | `feature/`     | `feat: `                  |
-   | `enhance/`     | `enhance: `               |
-   | `docs/`        | `docs: `                  |
-   | `chore/`       | `chore: `                 |
+   | `bugfix/`      | `fix:`                   |
+   | `feature/`     | `feat:`                  |
+   | `enhance/`     | `enhance:`               |
+   | `docs/`        | `docs:`                  |
+   | `chore/`       | `chore:`                 |
 
 ### Step 5: ドキュメント整合性チェック
 
@@ -73,10 +73,12 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 3. **結果に応じた処理**:
    - **不整合を検出した場合**: 以下の形式で警告を表示し、続行する（PR作成はブロックしない）:
-     ```
+
+     ```text
      ⚠️ ドキュメント整合性チェック:
      - <検出内容>: <対象ドキュメント>の更新が必要な可能性があります
      ```
+
    - **検出対象パターンに該当しない場合**: 何も表示せずStep 6へ進む
 
 ### Step 6: PR作成
@@ -84,7 +86,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 1. PRタイトルを生成する（70文字以内、Step 4で推定したプレフィックスを使用）
 2. PR本文を以下のテンプレートで生成する:
 
-   ```
+   ```markdown
    ## Summary
    - <変更の要点1>
    - <変更の要点2>
@@ -99,19 +101,21 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 3. `gh pr create --base main --title "..." --body "..."` でPRを作成する
    - bodyはheredocを使用してフォーマットを保持する:
-     ```
+
+     ```bash
      gh pr create --base main --title "<タイトル>" --body "$(cat <<'EOF'
      <本文>
      EOF
      )"
      ```
+
 4. 失敗した場合はエラーメッセージを表示して終了する
 
 ### Step 7: 結果表示
 
 作成結果を以下の形式で表示する:
 
-```
+```text
 ## PR作成完了
 
 PR #XX: <タイトル>

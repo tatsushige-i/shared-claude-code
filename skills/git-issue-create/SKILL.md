@@ -37,7 +37,8 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
 2. **Body**: Generate in Japanese using the template appropriate for the type label:
 
    **For `feature` / `enhancement` / `bug`:**
-   ```
+
+   ```markdown
    ## Overview
    <Describe the purpose of the change in 1-2 sentences>
 
@@ -55,7 +56,8 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
    ```
 
    **For `documentation` / `chore`:**
-   ```
+
+   ```markdown
    ## Overview
    <Describe the purpose of the change in 1-2 sentences>
 
@@ -73,7 +75,7 @@ Automate the workflow for creating GitHub Issues from conversation context. Perf
 
 Display a preview in the following format and obtain user approval:
 
-```
+```text
 ## Issue Preview
 
 **Title**: <title>
@@ -93,19 +95,21 @@ Shall I create the Issue with this content? Let me know if you'd like any change
 ### Step 4: Create Issue
 
 1. Create the Issue using `gh issue create`:
-   ```
+
+   ```bash
    gh issue create --title "<title>" --label "<type label>" --label "<priority label>" --body "$(cat <<'EOF'
    <body>
    EOF
    )"
    ```
+
 2. If it fails, display the error message and exit
 
 ### Step 5: Display Results
 
 Display the creation results in the following format:
 
-```
+```text
 ## Issue Created
 
 Issue #XX: <title>

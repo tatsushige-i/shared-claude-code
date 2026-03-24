@@ -6,7 +6,7 @@ A centralized source of shared Claude Code rules and skills for use across multi
 
 ## Structure
 
-```
+```text
 rules/                  # Master rule files (English) — symlinked into consuming repos
 ├── conventions.md      # Development conventions
 ├── security.md         # Security rules

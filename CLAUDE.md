@@ -7,10 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A centralized source of shared Claude Code rules and skills distributed to consuming projects. All consuming repositories must live in the same parent directory as this one.
 
 **Distribution methods:**
+
 - **Rules and skills** — distributed via symlinks into `.claude/rules/` and `.claude/skills/` of consuming repos
 - **GitHub configuration and CI templates** — distributed via file copy using the `/config-github-sync` skill
 
 **Symlink pattern** (from a consuming repo):
+
 ```bash
 ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/conventions.md
 ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
@@ -18,7 +20,7 @@ ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 
 ## Repository Structure
 
-```
+```text
 rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
 skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
   README.md     # Skills index table — must be updated when adding a skill
