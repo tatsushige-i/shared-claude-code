@@ -5,7 +5,7 @@ description: Sync .github files and ci-templates from shared-claude-code reposit
 
 # GitHub Config Sync Skill
 
-Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-claude-code repository to the current project using file copies. File copies are used because GitHub does not recognize symlinks.
+Sync shared assets under `.github/` (ISSUE_TEMPLATE, PULL_REQUEST_TEMPLATE, workflows) from the shared-claude-code repository to the current project using file copies. File copies are used because GitHub does not recognize symlinks.
 
 ## Steps
 
@@ -25,7 +25,7 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-
 
 ### Step 2: Detect Differences
 
-1. Scan `.github/ISSUE_TEMPLATE/` and `.github/workflows/` on the shared side
+1. Scan `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md`, and `.github/workflows/` on the shared side
 2. Compare with the corresponding local files and determine each file's status:
    - **Identical**: contents match (determined by `diff -q`)
    - **Differs**: exists on both sides but contents differ
@@ -47,6 +47,9 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-
    - chore.yml — ローカルに存在しない（新規追加）
    - enhancement.yml — 差分あり
 
+   ### PULL_REQUEST_TEMPLATE
+   - PULL_REQUEST_TEMPLATE.md — 差分あり
+
    ### workflows
    - ci.yml — 差分あり
 
@@ -60,7 +63,7 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, workflows) from the shared-
 
 ### Step 4: Copy Files
 
-1. Create `.github/ISSUE_TEMPLATE/` and `.github/workflows/` directories with `mkdir -p` if they do not exist
+1. Create `.github/ISSUE_TEMPLATE/` and `.github/workflows/` directories with `mkdir -p` if they do not exist. For `PULL_REQUEST_TEMPLATE.md`, ensure `.github/` exists.
 2. Overwrite-copy selected items with `cp`
 3. After copying, verify contents match with `diff -q`
    - If mismatch → display error
@@ -160,6 +163,7 @@ Display sync results in the following format:
 - 同期したISSUE_TEMPLATE: X件
   - <ファイル名1>（新規追加）
   - <ファイル名2>（更新）
+- 同期したPULL_REQUEST_TEMPLATE: （新規追加 or 更新）
 - 同期したワークフロー: X件
   - <ファイル名1>（更新）
 - 同期したCIテンプレート（<lang>）: X件
