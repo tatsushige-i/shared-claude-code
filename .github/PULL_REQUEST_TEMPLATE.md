@@ -1,21 +1,21 @@
-## 概要
+## Summary
 
-<!-- この変更の背景・目的を簡潔に記載してください -->
+<!-- Briefly describe the background and purpose of this change -->
 
-## 変更内容
+## Changes
 
-<!-- 具体的な変更点を箇条書きで記載してください -->
-
--
-
-## テスト方法
-
-<!-- テスト手順・確認方法を記載してください -->
+<!-- List the specific changes as bullet points -->
 
 -
 
-## チェックリスト
+## Test Plan
 
-- [ ] 変更内容が Issue の要件を満たしている
-- [ ] 不要なファイル変更が含まれていない
-- [ ] セキュリティ上の問題がない（API キー、トークン等のハードコードなし）
+<!-- Describe the testing steps and verification method -->
+
+-
+
+## Checklist
+
+- [ ] Changes satisfy the Issue requirements
+- [ ] No unnecessary file changes are included
+- [ ] No security issues (no hardcoded API keys, tokens, etc.)
