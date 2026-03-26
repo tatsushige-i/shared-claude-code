@@ -78,5 +78,18 @@
         }
       ]
     }
+  ],
+  "PreCompact": [
+    {
+      "hooks": [
+        {
+          "_id": "save-precompact-summary",
+          "_description": "Save git context to .claude/compact-summary.md before compaction",
+          "_detect_by": "PreCompact|compact-summary",
+          "type": "command",
+          "command": "REPO=$(git rev-parse --show-toplevel 2>/dev/null || pwd); BRANCH=$(git branch --show-current 2>/dev/null); STATUS=$(git status --short 2>/dev/null | head -20); TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S'); mkdir -p \"$REPO/.claude\"; { echo \"# Pre-Compact Summary\"; echo \"\"; echo \"Timestamp: $TIMESTAMP\"; echo \"\"; echo \"## Git State\"; echo \"\"; echo \"Branch: $BRANCH\"; if [ -n \"$STATUS\" ]; then echo \"\"; echo \"Uncommitted changes:\"; echo \"$STATUS\"; else echo \"Working tree: clean\"; fi; } | tee \"$REPO/.claude/compact-summary.md\""
+        }
+      ]
+    }
   ]
 }
