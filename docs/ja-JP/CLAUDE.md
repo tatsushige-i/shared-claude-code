@@ -2,7 +2,7 @@
 
 このファイルは、このリポジトリで作業する Claude Code (claude.ai/code) へのガイダンスを提供します。
 
-## このリポジトリについて
+## プロジェクト概要
 
 複数のプロジェクトへ配布する、Claude Code の共通ルールとスキルの集約リポジトリです。すべての消費リポジトリは、このリポジトリと同じ親ディレクトリに配置する必要があります。
 
@@ -11,34 +11,15 @@
 - **ルールとスキル** — シンボリックリンクで消費リポジトリの `.claude/rules/` と `.claude/skills/` に配布
 - **GitHub設定とCIテンプレート** — `/config-github-sync` スキルによるファイルコピーで配布
 
-**シンボリックリンクの作成例**（消費リポジトリ側で実行）:
+## アーキテクチャ
 
-```bash
-ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/conventions.md
-ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
-```
-
-## ディレクトリ構成
-
-```text
-rules/          # マスタールールファイル（英語） — 消費リポジトリの .claude/rules/ にシンボリックリンク
-skills/         # マスタースキル定義 — 消費リポジトリの .claude/skills/ にシンボリックリンク
-  README.md     # スキル一覧テーブル — スキル追加時に更新必須
-hooks/
-  shared-hooks.json  # 共通hooks定義 — config-claude-sync で消費リポジトリの .claude/settings.json にマージ
-.claude/
-  rules/        # シンボリックリンク → ../../rules/
-  skills/       # シンボリックリンク → ../../skills/
-  settings.json # このリポジトリ用のhook設定
-ci-templates/   # 言語別CIテンプレート — /config-github-sync によるファイルコピーで消費リポジトリに配布
-  nextjs/       # Next.js テンプレート（ESLint, Jest, TypeScript設定）
-.github/
-  ISSUE_TEMPLATE/   # Issueテンプレート（日本語） — /config-github-sync によるファイルコピーで消費リポジトリに配布
-docs/ja-JP/     # 日本語翻訳（補足資料。英語版が正）
-  rules/        # rules/ の翻訳
-  skills/       # skills/ の翻訳
-  local-skills/ # ローカルスキルの翻訳
-```
+- **rules/** — マスタールールファイル（英語）、消費リポジトリにシンボリックリンク
+- **skills/** — マスタースキル定義、消費リポジトリにシンボリックリンク
+- **hooks/** — 共通hooks定義（`shared-hooks.json`）、`config-claude-sync` でマージ
+- **.claude/** — `rules/` と `skills/` へのシンボリックリンク、およびこのリポジトリ用 `settings.json`
+- **ci-templates/** — 言語別CIテンプレート、`/config-github-sync` でコピー
+- **.github/** — Issue/PRテンプレート、`/config-github-sync` でコピー
+- **docs/ja-JP/** — 日本語翻訳（補足資料。英語版が正）
 
 ## 新しいスキルの追加手順
 

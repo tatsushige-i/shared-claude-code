@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What This Repository Is
+## Project Overview
 
 A centralized source of shared Claude Code rules and skills distributed to consuming projects. All consuming repositories must live in the same parent directory as this one.
 
@@ -11,34 +11,15 @@ A centralized source of shared Claude Code rules and skills distributed to consu
 - **Rules and skills** — distributed via symlinks into `.claude/rules/` and `.claude/skills/` of consuming repos
 - **GitHub configuration and CI templates** — distributed via file copy using the `/config-github-sync` skill
 
-**Symlink pattern** (from a consuming repo):
+## Architecture
 
-```bash
-ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/conventions.md
-ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
-```
-
-## Repository Structure
-
-```text
-rules/          # Master rule files (English) — symlinked into .claude/rules/ of consuming repos
-skills/         # Master skill definitions — symlinked into .claude/skills/ of consuming repos
-  README.md     # Skills index table — must be updated when adding a skill
-hooks/
-  shared-hooks.json  # Common hook definitions — merged into .claude/settings.json of consuming repos via config-claude-sync
-.claude/
-  rules/        # Symlinks → ../../rules/
-  skills/       # Symlinks → ../../skills/
-  settings.json # Hook configuration for this repository
-ci-templates/   # CI/config templates by language — copied to consuming repos via /config-github-sync
-  nextjs/       # Next.js template (ESLint, Jest, TypeScript configs)
-.github/
-  ISSUE_TEMPLATE/   # Issue templates (Japanese) — copied to consuming repos via /config-github-sync
-docs/ja-JP/     # Japanese translations (supplementary, not authoritative)
-  rules/        # Translations of rules/
-  skills/       # Translations of skills/
-  local-skills/ # Translations of local skills
-```
+- **rules/** — Master rule files (English), symlinked into consuming repos
+- **skills/** — Master skill definitions, symlinked into consuming repos
+- **hooks/** — Shared hook definitions (`shared-hooks.json`), merged via `config-claude-sync`
+- **.claude/** — Symlinks to `rules/` and `skills/`, plus `settings.json` for this repo
+- **ci-templates/** — CI/config templates by language, copied via `/config-github-sync`
+- **.github/** — Issue/PR templates, copied via `/config-github-sync`
+- **docs/ja-JP/** — Japanese translations (supplementary, not authoritative)
 
 ## Adding a New Skill
 
