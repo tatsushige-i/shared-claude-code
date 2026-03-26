@@ -42,6 +42,16 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "BRANCH=$(git branch --show-current 2>/dev/null); STATUS=$(git status --short 2>/dev/null | head -20); if [ -n \"$BRANCH\" ]; then echo \"# Git Context\"; echo \"Branch: $BRANCH\"; if [ -n \"$STATUS\" ]; then echo \"Uncommitted changes:\"; echo \"$STATUS\"; else echo \"Working tree: clean\"; fi; fi"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
