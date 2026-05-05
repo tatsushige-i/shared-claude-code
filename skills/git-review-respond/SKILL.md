@@ -112,6 +112,8 @@ After applying these criteria, classify each comment into one of the following:
 
 ### Step 5: Present Analysis Results (User Confirmation)
 
+Reply drafts must already follow the style guidelines in Step 9 — they will be posted as-is. For "No action needed" comments where no reply is needed, write `(no reply)`.
+
 Display the classification results in the following format and wait for user approval:
 
 ```text
@@ -124,16 +126,19 @@ Target comments: X
 1. `path/to/file.ts:L42` - @reviewer
    > Summary of comment
    → Fix approach: change ~
+   → Reply draft: "Changed `xxx` to `yyy`."
 
 ### Needs response (X)
 1. `path/to/file.ts:L10` - @reviewer
    > Summary of comment
    → Response approach: explain ~
+   → Reply draft: "<answer text>"
 
 ### No action needed (X)
 1. `path/to/file.ts:L5` - @reviewer
    > Summary of comment
    → Reason: praise comment
+   → Reply draft: (no reply)
 
 Shall I proceed with these?
 ```
@@ -169,6 +174,8 @@ If any check fails, fix the issue and re-run.
 **Note**: If there are no "Needs fix" comments and no code changes, skip this step.
 
 ### Step 9: Reply to Comments
+
+Use the reply drafts approved in Step 5. Adjust only if the actual fix in Step 6 diverged from the planned approach.
 
 Reply to each comment using `gh api`. Post replies in the same thread as the original comment:
 
