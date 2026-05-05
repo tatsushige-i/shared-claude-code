@@ -187,6 +187,17 @@ Reply content guidelines:
 
 Write replies in Japanese (when the reviewer uses Japanese). If the review comment is in English, reply in English.
 
+**Style guidelines** (avoid wasting output tokens without lowering quality):
+
+- Do not start with greetings or thanks (e.g., "ご指摘ありがとうございます", "Thanks for the review")
+- Do not end with closing pleasantries (e.g., "よろしくお願いします", "ご確認ください")
+- Avoid excessive humble forms in Japanese — use plain ます-form, not "〜させていただきました" / "〜いたしました"
+- Drop hedges ("〜と思います", "〜かと思われます") when stating a fact you're confident about; keep them only when genuinely uncertain
+- Skip filler openers ("念のため", "一応", "ちなみに") that add no information
+- Don't restate the same fact in different words
+
+Keep: the substance of the fix (what/why), direct answers to questions, the rationale when rejecting a suggestion, and necessary context for design decisions.
+
 **Signature**: Append the following signature at the end of each reply body:
 
 ```text
