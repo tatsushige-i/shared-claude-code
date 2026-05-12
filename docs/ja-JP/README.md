@@ -40,20 +40,23 @@ docs/ja-JP/             # 日本語翻訳（補足資料。英語版が正）
 消費リポジトリのルートから、共有ルールとスキルへのシンボリックリンクを作成する:
 
 ```bash
+# 配置先ディレクトリを作成
+mkdir -p .claude/rules/shared .claude/skills
+
 # ルール
-ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
-ln -s ../../shared-claude-code/rules/security.md .claude/rules/shared/security.md
-ln -s ../../shared-claude-code/rules/tech-debt-checklist.md .claude/rules/shared/tech-debt-checklist.md
+ln -s ../../../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
+ln -s ../../../../shared-claude-code/rules/security.md .claude/rules/shared/security.md
+ln -s ../../../../shared-claude-code/rules/tech-debt-checklist.md .claude/rules/shared/tech-debt-checklist.md
 
 # スキル
-ln -s ../../shared-claude-code/skills/config-claude-sync .claude/skills/config-claude-sync
-ln -s ../../shared-claude-code/skills/config-github-sync .claude/skills/config-github-sync
-ln -s ../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
-ln -s ../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
-ln -s ../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
-ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
-ln -s ../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
-ln -s ../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
+ln -s ../../../shared-claude-code/skills/config-claude-sync .claude/skills/config-claude-sync
+ln -s ../../../shared-claude-code/skills/config-github-sync .claude/skills/config-github-sync
+ln -s ../../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
+ln -s ../../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
+ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
+ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 ```
 
 または `/config-claude-sync` スキルを使って、不足しているシンボリックリンクを自動検出・作成できる。
