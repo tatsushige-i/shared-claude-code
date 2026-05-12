@@ -40,20 +40,23 @@ docs/ja-JP/             # Japanese translations (supplementary, not authoritativ
 From the consuming repository root, create symlinks to shared rules and skills:
 
 ```bash
+# Create destination directories
+mkdir -p .claude/rules/shared .claude/skills
+
 # Rules
-ln -s ../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
-ln -s ../../shared-claude-code/rules/security.md .claude/rules/shared/security.md
-ln -s ../../shared-claude-code/rules/tech-debt-checklist.md .claude/rules/shared/tech-debt-checklist.md
+ln -s ../../../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
+ln -s ../../../../shared-claude-code/rules/security.md .claude/rules/shared/security.md
+ln -s ../../../../shared-claude-code/rules/tech-debt-checklist.md .claude/rules/shared/tech-debt-checklist.md
 
 # Skills
-ln -s ../../shared-claude-code/skills/config-claude-sync .claude/skills/config-claude-sync
-ln -s ../../shared-claude-code/skills/config-github-sync .claude/skills/config-github-sync
-ln -s ../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
-ln -s ../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
-ln -s ../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
-ln -s ../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
-ln -s ../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
-ln -s ../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
+ln -s ../../../shared-claude-code/skills/config-claude-sync .claude/skills/config-claude-sync
+ln -s ../../../shared-claude-code/skills/config-github-sync .claude/skills/config-github-sync
+ln -s ../../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-branch-cleanup
+ln -s ../../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
+ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
+ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 ```
 
 Or use the `/config-claude-sync` skill to detect missing symlinks and create them automatically.
