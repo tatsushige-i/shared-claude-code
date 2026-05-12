@@ -21,6 +21,8 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── git-pr-create/      # Create GitHub PR with analysis
 ├── git-review-respond/ # Respond to PR review comments
 └── tech-debt-audit-nextjs/ # Audit technical debt in Next.js projects
+hooks/                  # Shared hook definitions — merged into consuming repos' settings.json via config-claude-sync
+└── shared-hooks.json   # Shared hooks for PreToolUse / Stop / UserPromptSubmit / etc.
 ci-templates/           # CI/config templates by language — copied to consuming repos
 └── nextjs/             # Next.js template (ESLint, Jest, TypeScript configs)
 .github/
@@ -61,6 +63,8 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 
 Or use the `/config-claude-sync` skill to detect missing symlinks and create them automatically.
 
+The `/config-claude-sync` skill also merges shared hook entries from `hooks/shared-hooks.json` into the consuming repository's `.claude/settings.json` (existing entries are preserved; only new or updated hooks are applied). No manual symlinking is required for hooks.
+
 ### 2. Copy GitHub configuration and CI templates
 
 Use the `/config-github-sync` skill to copy Issue templates, workflow files, and CI configuration templates to your repository.
@@ -69,7 +73,7 @@ Use the `/config-github-sync` skill to copy Issue templates, workflow files, and
 
 | Skill | Command | Description |
 |---|---|---|
-| `config-claude-sync` | `/config-claude-sync` | Detect missing symlinks and sync rules/skills under `.claude/` |
+| `config-claude-sync` | `/config-claude-sync` | Detect missing symlinks and sync rules/skills under `.claude/`, and merge shared hooks into `settings.json` |
 | `config-github-sync` | `/config-github-sync` | Detect diffs and copy-sync ISSUE_TEMPLATE/workflows under `.github/` |
 | `git-branch-cleanup` | `/git-branch-cleanup` | Local branch cleanup (switch to main, delete branches, pull) |
 | `git-issue-create` | `/git-issue-create` | Create Issue from conversation context (title, body, label inference, preview) |

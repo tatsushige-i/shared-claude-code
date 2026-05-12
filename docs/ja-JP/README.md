@@ -21,6 +21,8 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── git-pr-create/      # 分析付きGitHub PR作成
 ├── git-review-respond/ # PRレビューコメントへの対応
 └── tech-debt-audit-nextjs/ # Next.jsプロジェクトの技術的負債調査
+hooks/                  # 共通hooks定義 — config-claude-sync で消費リポジトリの settings.json にマージ
+└── shared-hooks.json   # PreToolUse / Stop / UserPromptSubmit 等の共通hooks
 ci-templates/           # 言語別CI/設定テンプレート — ファイルコピーで消費リポジトリに配布
 └── nextjs/             # Next.js テンプレート（ESLint, Jest, TypeScript設定）
 .github/
@@ -61,6 +63,8 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 
 または `/config-claude-sync` スキルを使って、不足しているシンボリックリンクを自動検出・作成できる。
 
+`/config-claude-sync` スキルは、`hooks/shared-hooks.json` の共通hooksエントリを消費リポジトリの `.claude/settings.json` にマージする処理も併せて行う（既存エントリは保持され、新規・更新のあったhookのみが適用される）。hooksにシンボリックリンクは不要。
+
 ### 2. GitHub設定とCIテンプレートのコピー
 
 `/config-github-sync` スキルを使って、Issueテンプレート、ワークフローファイル、CI設定テンプレートをリポジトリにコピーする。
@@ -69,7 +73,7 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 
 | スキル | コマンド | 説明 |
 |---|---|---|
-| `config-claude-sync` | `/config-claude-sync` | `.claude/`配下（rules, skills）の差分検出・シンボリックリンク同期 |
+| `config-claude-sync` | `/config-claude-sync` | `.claude/`配下（rules, skills）の差分検出・シンボリックリンク同期、および共通hooksの `settings.json` へのマージ |
 | `config-github-sync` | `/config-github-sync` | `.github/`配下（ISSUE_TEMPLATE, workflows）の差分検出・コピー同期 |
 | `git-branch-cleanup` | `/git-branch-cleanup` | ローカルブランチクリーンアップ（main切替・ブランチ削除・pull） |
 | `git-issue-create` | `/git-issue-create` | 会話の文脈からIssue作成（タイトル・本文・ラベル推定・プレビュー） |
