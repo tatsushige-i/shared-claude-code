@@ -21,6 +21,10 @@ A centralized source of shared Claude Code rules and skills distributed to consu
 - **.github/** — Issue/PR templates, copied via `/config-github-sync`
 - **docs/ja-JP/** — Japanese translations (supplementary, not authoritative)
 
+## Documentation Language (this repo)
+
+All master `.md` files in this repository (rules, skills, README, CLAUDE.md) must be written in **English**. Japanese translations are placed under `docs/ja-JP/` as supplementary documentation, and `docs/ja-JP/` is reserved for translations of English masters only.
+
 ## Adding a New Skill
 
 When adding a skill, confirm with the user whether it is a **shared skill** or a **repo-local skill**.
