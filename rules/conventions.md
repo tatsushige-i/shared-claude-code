@@ -79,7 +79,9 @@ Both a **type label** and a **priority label** must be assigned when creating an
 
 ## Documentation Language
 
-All master `.md` files (rules, skills, README, etc.) must be written in **English**. Japanese translations are placed under `docs/ja-JP/` as supplementary documentation.
+Documentation language and internal documentation structure (e.g., spec docs, design docs) are each project's responsibility. Define them in the project's `CLAUDE.md` or `.claude/rules/`.
+
+Note: This rule does **not** apply to shared rules and skills under `.claude/rules/shared/` and `.claude/skills/` (symlinked from `shared-claude-code`), which remain English masters as defined by their upstream repository.
 
 ## Issue and PR Language
 
