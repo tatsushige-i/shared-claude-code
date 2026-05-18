@@ -11,4 +11,5 @@ Shared skills distributed to consuming repositories via symlinks. Each skill is 
 | `git-issue-start` | `/git-issue-start <Issue#>` | Fetch Issue, validate labels, create branch, enter Plan Mode |
 | `git-pr-create` | `/git-pr-create` | Identify Issue, check size limits, analyze diff, create PR |
 | `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
+| `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Audit technical debt in Flutter / Dart projects with prioritized report |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Audit technical debt in Next.js (App Router) projects with prioritized report |
