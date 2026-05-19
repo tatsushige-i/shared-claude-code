@@ -71,7 +71,18 @@ description: Create a GitHub Issue from conversation context - analyze context, 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
-### Step 3: プレビュー・ユーザー確認
+### Step 3: オープン中マイルストーンの取得
+
+現在のリポジトリでオープン中のマイルストーン一覧を取得する:
+
+```bash
+gh api "repos/{owner}/{repo}/milestones?state=open" --jq '.[].title'
+```
+
+- コマンドが失敗した場合、または空の結果が返った場合 → マイルストーン処理は行わず、未設定のまま次のステップへ進む。プレビューおよび結果表示からもマイルストーン行を省略する。
+- それ以外の場合は、取得したタイトル一覧をプレビューで利用するために保持する。既定値は「設定しない」。
+
+### Step 4: プレビュー・ユーザー確認
 
 以下の形式でプレビューを表示し、ユーザーの承認を得る:
 
@@ -81,6 +92,8 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 **タイトル**: <タイトル>
 **種類ラベル**: <ラベル>
 **優先度ラベル**: <ラベル>
+**マイルストーン**: <選択されたタイトル または "設定しない">
+  (候補: <タイトル1>, <タイトル2>, ...)
 
 ---
 <本文>
@@ -89,15 +102,21 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 この内容でIssueを作成してよろしいですか？修正点があればお知らせください。
 ```
 
-- ユーザーが承認した場合 → Step 4へ進む
-- ユーザーが修正を指示した場合 → 修正を反映して再度プレビューを表示する
+- 「**マイルストーン**:」行と「(候補: ...)」行は、Step 3 で 1 件以上のマイルストーンが取得できた場合のみ表示する。取得済みの全タイトルを列挙する。
+- ユーザーが承認した場合 → Step 5へ進む
+- ユーザーが修正を指示した場合（マイルストーンの選択変更も含む） → 修正を反映して再度プレビューを表示する
 
-### Step 4: Issue作成
+### Step 5: Issue作成
 
-1. `gh issue create` でIssueを作成する:
+1. `gh issue create` でIssueを作成する。`--milestone "<タイトル>"` は、Step 4 でユーザーが具体的なマイルストーンを選択した場合のみ付与する（「設定しない」やマイルストーンが存在しない場合は省略する）:
 
    ```bash
-   gh issue create --title "<タイトル>" --label "<種類ラベル>" --label "<優先度ラベル>" --body "$(cat <<'EOF'
+   gh issue create \
+     --title "<タイトル>" \
+     --label "<種類ラベル>" \
+     --label "<優先度ラベル>" \
+     [--milestone "<タイトル>"] \
+     --body "$(cat <<'EOF'
    <本文>
    EOF
    )"
@@ -105,9 +124,9 @@ description: Create a GitHub Issue from conversation context - analyze context, 
 
 2. 失敗した場合はエラーメッセージを表示して終了する
 
-### Step 5: 結果表示
+### Step 6: 結果表示
 
-作成結果を以下の形式で表示する:
+作成結果を以下の形式で表示する。`マイルストーン` 行はマイルストーンが設定された場合のみ表示する:
 
 ```text
 ## Issue作成完了
@@ -117,4 +136,5 @@ Issue #XX: <タイトル>
 
 - 種類ラベル: <種類ラベル>
 - 優先度ラベル: <優先度ラベル>
+- マイルストーン: <タイトル>
 ```
