@@ -15,7 +15,7 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── README.md           # スキル一覧テーブル
 ├── config-claude-sync/ # ルール・スキルをシンボリックリンクで同期
 ├── config-github-sync/ # .githubファイルとCIテンプレートをファイルコピーで同期
-├── git-branch-cleanup/ # PRマージ後のローカルブランチクリーンアップ
+├── git-branch-cleanup/ # PRマージ後の対象 worktree 限定クリーンアップ
 ├── git-issue-create/   # 会話コンテキストからGitHub Issueを作成
 ├── git-issue-start/    # GitHub Issueからの作業開始ワークフロー
 ├── git-pr-create/      # 分析付きGitHub PR作成
@@ -77,7 +77,7 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 |---|---|---|
 | `config-claude-sync` | `/config-claude-sync` | `.claude/`配下（rules, skills）の差分検出・シンボリックリンク同期、および共通hooksの `settings.json` へのマージ |
 | `config-github-sync` | `/config-github-sync` | `.github/`配下（ISSUE_TEMPLATE, workflows）の差分検出・コピー同期 |
-| `git-branch-cleanup` | `/git-branch-cleanup` | ローカルブランチクリーンアップ（main切替・ブランチ削除・pull） |
+| `git-branch-cleanup` | `/git-branch-cleanup` | 対象 worktree とその作業ブランチに限定したクリーンアップ |
 | `git-issue-create` | `/git-issue-create` | 会話の文脈からIssue作成（タイトル・本文・ラベル推定・プレビュー） |
 | `git-issue-start` | `/git-issue-start <Issue#>` | Issue取得・ラベル検証・ブランチ作成・Plan Mode移行 |
 | `git-pr-create` | `/git-pr-create` | Issue特定・規模チェック・差分分析・PR作成 |
