@@ -15,7 +15,7 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── README.md           # Skills index table
 ├── config-claude-sync/ # Sync shared rules/skills via symlinks
 ├── config-github-sync/ # Sync .github files and CI templates via file copy
-├── git-branch-cleanup/ # Local branch cleanup after PR merge
+├── git-branch-cleanup/ # Worktree-scoped cleanup after PR merge
 ├── git-issue-create/   # Create GitHub Issue from conversation context
 ├── git-issue-start/    # Start workflow from GitHub Issue
 ├── git-pr-create/      # Create GitHub PR with analysis
@@ -77,7 +77,7 @@ Use the `/config-github-sync` skill to copy Issue templates, workflow files, and
 |---|---|---|
 | `config-claude-sync` | `/config-claude-sync` | Detect missing symlinks and sync rules/skills under `.claude/`, and merge shared hooks into `settings.json` |
 | `config-github-sync` | `/config-github-sync` | Detect diffs and copy-sync ISSUE_TEMPLATE/workflows under `.github/` |
-| `git-branch-cleanup` | `/git-branch-cleanup` | Local branch cleanup (switch to main, delete branches, pull) |
+| `git-branch-cleanup` | `/git-branch-cleanup` | Worktree-scoped cleanup — remove current worktree and its working branch |
 | `git-issue-create` | `/git-issue-create` | Create Issue from conversation context (title, body, label inference, preview) |
 | `git-issue-start` | `/git-issue-start <Issue#>` | Fetch Issue, validate labels, create branch, enter Plan Mode |
 | `git-pr-create` | `/git-pr-create` | Identify Issue, check size limits, analyze diff, create PR |
