@@ -20,7 +20,7 @@ PR マージ後に **現在の worktree** と **そこで checkout している�
 このスキルはユーザーが明示的に `/git-branch-cleanup` を実行した時点で全操作が承認済みである。以下を厳守すること:
 
 - **全操作を 1 つの Bash tool call のコマンドチェーンで実行する。Bash tool call を分割してはならない**
-- `git checkout main`, `git worktree remove`, `git branch -D`, `git fetch origin` はすべて事前承認済みの操作として扱う
+- `git checkout main`, `git worktree remove`, `git branch -D`, `git fetch origin`, `git pull --ff-only origin main` はすべて事前承認済みの操作として扱う
 - ステップ間で「実行してよいですか？」「続行しますか？」等の質問を挟まない
 - エラーが発生した場合、または「対象なし（主 worktree かつ main 上）」を検出した場合のみ停止する
 
@@ -39,14 +39,15 @@ if [ "$GITDIR" = "$COMMONDIR" ]; then
   if [ "$BRANCH" = "main" ]; then echo "対象なし: 主 worktree の main にいるため削除対象がありません。"; exit 0; fi
   git checkout main
   git branch -D "$BRANCH"
+  git pull --ff-only origin main
 else
   WORKTREE_PATH=$(git rev-parse --show-toplevel)
   MAIN_PATH=$(git worktree list --porcelain | awk '/^worktree/{print $2; exit}')
   cd "$MAIN_PATH"
   git worktree remove "$WORKTREE_PATH"
   git branch -D "$BRANCH"
+  git fetch origin
 fi
-git fetch origin
 ```
 
 ## 処理手順（参考）
@@ -63,7 +64,7 @@ git fetch origin
 主 worktree（メインクローン）で実行された場合:
 
 1. 現在ブランチが `main` → `対象なし: 主 worktree の main にいるため削除対象がありません。` を表示して終了する。他のブランチや worktree には一切触れない。
-2. それ以外 → `git checkout main` の後、`git branch -D <作業ブランチ>` を実行する。
+2. それ以外 → `git checkout main` の後、`git branch -D <作業ブランチ>` を実行し、続けて `git pull --ff-only origin main` でローカル `main` を `origin/main` に fast-forward する。ローカル `main` に想定外のコミットがある場合は `--ff-only` により失敗して停止し、ユーザが気付ける。
 
 ### Step 2B: linked worktree の場合
 
@@ -78,8 +79,8 @@ linked worktree で実行された場合:
 
 ### Step 3: リモート参照の更新
 
-1. `git fetch origin` で remote-tracking refs を更新する。
-2. 主 worktree の `main` の作業コピーは自動で fast-forward しない。ユーザーが次にその worktree へ戻ったタイミングで pull する想定。
+- **主 worktree 分岐**: Step 2A の `git pull --ff-only origin main` ですでにローカル `main` を `origin/main` に fast-forward 済み。
+- **linked worktree 分岐**: `git fetch origin` で remote-tracking refs のみ更新する。主 worktree で checkout 中のブランチ（`main` とは限らない）には触れない。ユーザーが次にその worktree へ戻ったタイミングで pull する想定。
 
 ### Step 4: 結果表示
 

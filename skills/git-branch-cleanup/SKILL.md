@@ -20,7 +20,7 @@ This skill assumes a parallel development workflow where Claude Code and Codex e
 All operations are pre-approved when the user explicitly runs `/git-branch-cleanup`. Strictly follow these rules:
 
 - **Execute all operations in a single Bash tool call command chain. Never split into multiple Bash tool calls**
-- Treat `git checkout main`, `git worktree remove`, `git branch -D`, and `git fetch origin` as pre-approved operations
+- Treat `git checkout main`, `git worktree remove`, `git branch -D`, `git fetch origin`, and `git pull --ff-only origin main` as pre-approved operations
 - Do not insert confirmation prompts like "Proceed?" or "Continue?" between steps
 - Stop only when an error occurs, or when the skill detects "nothing to clean" (primary worktree on `main`)
 
@@ -39,14 +39,15 @@ if [ "$GITDIR" = "$COMMONDIR" ]; then
   if [ "$BRANCH" = "main" ]; then echo "対象なし: 主 worktree の main にいるため削除対象がありません。"; exit 0; fi
   git checkout main
   git branch -D "$BRANCH"
+  git pull --ff-only origin main
 else
   WORKTREE_PATH=$(git rev-parse --show-toplevel)
   MAIN_PATH=$(git worktree list --porcelain | awk '/^worktree/{print $2; exit}')
   cd "$MAIN_PATH"
   git worktree remove "$WORKTREE_PATH"
   git branch -D "$BRANCH"
+  git fetch origin
 fi
-git fetch origin
 ```
 
 ## Steps (Reference)
@@ -63,7 +64,7 @@ git fetch origin
 If the current worktree is the primary worktree (the main clone):
 
 1. If the current branch is `main` → display `対象なし: 主 worktree の main にいるため削除対象がありません。` and exit. Do not touch any other branch or worktree.
-2. Otherwise → `git checkout main`, then `git branch -D <working branch>`.
+2. Otherwise → `git checkout main`, then `git branch -D <working branch>`, then `git pull --ff-only origin main` to fast-forward the local `main` to `origin/main`. If the local `main` has unexpected commits ahead of `origin/main`, `--ff-only` causes the pull to fail so the user notices.
 
 ### Step 2B: Linked Worktree
 
@@ -78,8 +79,8 @@ If the current worktree is a linked worktree:
 
 ### Step 3: Refresh Remote Refs
 
-1. Run `git fetch origin` to update remote-tracking refs.
-2. The primary worktree's `main` working copy is **not** fast-forwarded automatically — the user updates it when they next switch to that worktree.
+- **Primary worktree branch**: the local `main` working copy is already fast-forwarded to `origin/main` by Step 2A's `git pull --ff-only origin main`.
+- **Linked worktree branch**: run `git fetch origin` to update remote-tracking refs only. The primary worktree's checked-out branch (which may or may not be `main`) is **not** touched — the user updates it when they next switch to that worktree.
 
 ### Step 4: Display Results
 
