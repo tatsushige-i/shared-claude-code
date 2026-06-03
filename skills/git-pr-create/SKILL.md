@@ -9,16 +9,25 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 ## Steps
 
+### Step 0: Resolve Base Branch
+
+Resolve the base branch first so the rest of the flow works for both `main`-only repositories (backward compatible) and `main` + `develop` (git-flow lite) repositories. Use the resolved value wherever `<base>` appears below.
+
+1. Get the current branch with `git branch --show-current`
+2. Determine `<base>`:
+   - If the current branch starts with `hotfix/` → `<base>` = `main`
+   - Otherwise → run `git ls-remote --heads origin develop`; if `develop` exists → `<base>` = `develop`, else → `<base>` = `main`
+
 ### Step 1: Check Prerequisites
 
 1. Get the current branch with `git branch --show-current`
-   - If on `main` → display "Error: Cannot create a PR on the main branch. Please switch to a working branch." and exit
+   - If on `main` or `develop` → display "Error: Cannot create a PR on the `main`/`develop` branch. Please switch to a working branch." and exit
 2. Check for existing PRs with `gh pr list --head <branch name> --json number,url,state`
    - If an `OPEN` PR exists → display "Error: This branch already has an open PR: <URL>" and exit
 3. Check for uncommitted changes with `git status --porcelain`
    - If changes exist → analyze the changes, stage related files individually with `git add <file path>`, generate an appropriate commit message and `git commit` (do not use `git add -A` or `git add .`; for untracked files, judge relevance to the changes and exclude unrelated ones)
-4. Verify commits exist with `git log main..HEAD --oneline`
-   - If no commits → display "Error: No commits from the main branch." and exit
+4. Verify commits exist with `git log <base>..HEAD --oneline`
+   - If no commits → display "Error: No commits from the `<base>` branch." and exit
 5. Push the branch to remote:
    - Run `git push -u origin <branch name>`
    - If it fails, display the error and exit
@@ -27,7 +36,7 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 Search for the Issue automatically in the following order (do not ask the user):
 
-1. Get commit messages with `git log main..HEAD --format=%s%n%b` and look for Issue numbers using the `#(\d+)` pattern
+1. Get commit messages with `git log <base>..HEAD --format=%s%n%b` and look for Issue numbers using the `#(\d+)` pattern
 2. Search from the branch name — use `gh issue list --search "<keyword>" --json number,title,state` with numbers or keywords from the branch name
 3. Get recent open Issues with `gh issue list --state open --limit 10 --json number,title,labels` and infer the Issue from relevance to the branch name and changes
 4. Branch based on the result:
@@ -37,7 +46,7 @@ Search for the Issue automatically in the following order (do not ask the user):
 
 ### Step 3: PR Size Check
 
-1. Measure changed files, added lines, and deleted lines with `git diff --numstat main...HEAD`
+1. Measure changed files, added lines, and deleted lines with `git diff --numstat <base>...HEAD`
 2. Exclude auto-generated files (UI library generated files, etc.) from line counts
 3. Compare against the shared development conventions limits (10 files / 300 lines):
    - If exceeded → display a warning with a task-splitting suggestion and continue (do not request confirmation)
@@ -45,24 +54,27 @@ Search for the Issue automatically in the following order (do not ask the user):
 
 ### Step 4: Diff Analysis
 
-1. Understand the changes with `git log main..HEAD --oneline` and `git diff main...HEAD --stat`
-2. If needed, review detailed diffs with `git diff main...HEAD`
+1. Understand the changes with `git log <base>..HEAD --oneline` and `git diff <base>...HEAD --stat`
+2. If needed, review detailed diffs with `git diff <base>...HEAD`
 3. Infer the PR type from the branch prefix:
 
    | Prefix         | PR Title Prefix |
    |----------------|-----------------|
    | `bugfix/`      | `fix:`         |
+   | `hotfix/`      | `fix:`         |
    | `feature/`     | `feat:`        |
    | `enhance/`     | `enhance:`     |
    | `docs/`        | `docs:`        |
    | `chore/`       | `chore:`       |
 
+   Note on base: `hotfix/` targets `main` (urgent production fixes), while `bugfix/` and the other prefixes target `develop` when it exists (otherwise `main`). The base was already resolved in Step 0.
+
 ### Step 5: Documentation Consistency Check
 
-From the diff file list in `git diff main...HEAD --name-only`, detect changes that may require documentation updates using the following generic heuristics:
+From the diff file list in `git diff <base>...HEAD --name-only`, detect changes that may require documentation updates using the following generic heuristics:
 
 1. **Detection patterns**:
-   - **Route additions**: New additions of files that define routes by framework convention, such as `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` (extract new files only with `git diff main...HEAD --diff-filter=A --name-only`)
+   - **Route additions**: New additions of files that define routes by framework convention, such as `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` (extract new files only with `git diff <base>...HEAD --diff-filter=A --name-only`)
    - **Skill additions**: File additions/changes under `.claude/skills/`
    - **Config file changes**: Changes to config files at the project root (`*.config.*`, `.*rc`, `.*rc.*`, `tsconfig*.json`, `scripts` section in `package.json`, etc.)
 
@@ -99,11 +111,11 @@ From the diff file list in `git diff main...HEAD --name-only`, detect changes th
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
-3. Create the PR with `gh pr create --base main --title "..." --body "..."`
+3. Create the PR with `gh pr create --base <base> --title "..." --body "..."`
    - Use a heredoc for the body to preserve formatting:
 
      ```bash
-     gh pr create --base main --title "<title>" --body "$(cat <<'EOF'
+     gh pr create --base <base> --title "<title>" --body "$(cat <<'EOF'
      <body>
      EOF
      )"
