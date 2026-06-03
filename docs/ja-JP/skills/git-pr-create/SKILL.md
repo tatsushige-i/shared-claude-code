@@ -9,16 +9,25 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 ## 処理手順
 
+### Step 0: base ブランチの解決
+
+以降の処理が `main` のみのリポジトリ（後方互換）でも `main` + `develop`（git-flow ライト）のリポジトリでも動作するよう、最初に base ブランチを解決する。以降の `<base>` には解決した値を使用する。
+
+1. `git branch --show-current` で現在のブランチを取得する
+2. `<base>` を決定する:
+   - 現在のブランチが `hotfix/` で始まる → `<base>` = `main`
+   - それ以外 → `git ls-remote --heads origin develop` を実行し、`develop` があれば `<base>` = `develop`、なければ `<base>` = `main`
+
 ### Step 1: 前提条件の確認
 
 1. `git branch --show-current` で現在のブランチを取得する
-   - `main` の場合 → 「エラー: mainブランチ上ではPRを作成できません。作業ブランチに切り替えてください。」と表示して終了
+   - `main` または `develop` の場合 → 「エラー: `main`/`develop` ブランチ上ではPRを作成できません。作業ブランチに切り替えてください。」と表示して終了
 2. `gh pr list --head <ブランチ名> --json number,url,state` で既存PRを確認する
    - `OPEN` 状態のPRが存在する場合 → 「エラー: このブランチには既にオープンなPRがあります: <URL>」と表示して終了
 3. `git status --porcelain` で未コミット変更を確認する
    - 変更がある場合 → 変更内容を分析し、関連ファイルを個別に `git add <ファイルパス>` でステージし、適切なコミットメッセージを生成して `git commit` する（`git add -A` や `git add .` は使わない。未追跡ファイルは変更内容との関連性を判断し、無関係なものは除外する）
-4. `git log main..HEAD --oneline` でコミットの存在を確認する
-   - コミットがない場合 → 「エラー: mainブランチからのコミットがありません。」と表示して終了
+4. `git log <base>..HEAD --oneline` でコミットの存在を確認する
+   - コミットがない場合 → 「エラー: `<base>` ブランチからのコミットがありません。」と表示して終了
 5. リモートにブランチをプッシュする:
    - `git push -u origin <ブランチ名>` を実行
    - 失敗した場合はエラーを表示して終了
@@ -27,7 +36,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 以下の順序でIssueを探索し、自動で特定する（ユーザーへの質問は行わない）:
 
-1. `git log main..HEAD --format=%s%n%b` からコミットメッセージを取得し、`#(\d+)` パターンでIssue番号を探す
+1. `git log <base>..HEAD --format=%s%n%b` からコミットメッセージを取得し、`#(\d+)` パターンでIssue番号を探す
 2. ブランチ名から探索する — ブランチ名に含まれる番号やキーワードで `gh issue list --search "<キーワード>" --json number,title,state` を使いIssueを検索する
 3. `gh issue list --state open --limit 10 --json number,title,labels` で最近のオープンIssue一覧を取得し、ブランチ名・変更内容との関連性からIssueを推定する
 4. 結果に応じて分岐:
@@ -37,7 +46,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 ### Step 3: PR規模チェック
 
-1. `git diff --numstat main...HEAD` で変更ファイル数・追加行数・削除行数を計測する
+1. `git diff --numstat <base>...HEAD` で変更ファイル数・追加行数・削除行数を計測する
 2. 自動生成ファイル（UIライブラリの生成ファイル等）は行数カウントから除外する
 3. 共通開発規約の上限（10ファイル/300行）と比較する:
    - 超過している場合 → 警告とともにタスク分割の提案を表示して続行する（確認は求めない）
@@ -45,24 +54,27 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 ### Step 4: 差分分析
 
-1. `git log main..HEAD --oneline` と `git diff main...HEAD --stat` で変更内容を把握する
-2. 必要に応じて `git diff main...HEAD` で詳細な差分を確認する
+1. `git log <base>..HEAD --oneline` と `git diff <base>...HEAD --stat` で変更内容を把握する
+2. 必要に応じて `git diff <base>...HEAD` で詳細な差分を確認する
 3. ブランチプレフィックスからPRタイプを推定する:
 
    | プレフィックス | PRタイトルのプレフィックス |
    |----------------|---------------------------|
    | `bugfix/`      | `fix:`                   |
+   | `hotfix/`      | `fix:`                   |
    | `feature/`     | `feat:`                  |
    | `enhance/`     | `enhance:`               |
    | `docs/`        | `docs:`                  |
    | `chore/`       | `chore:`                 |
 
+   base に関する補足: `hotfix/` は `main`（緊急の本番修正）を対象とし、`bugfix/` やその他のプレフィックスは `develop` があれば `develop` を、なければ `main` を対象とする。base は Step 0 で解決済み。
+
 ### Step 5: ドキュメント整合性チェック
 
-`git diff main...HEAD --name-only` の差分ファイル一覧から、以下の汎用ヒューリスティクスでドキュメント更新が必要な変更を検出する:
+`git diff <base>...HEAD --name-only` の差分ファイル一覧から、以下の汎用ヒューリスティクスでドキュメント更新が必要な変更を検出する:
 
 1. **検出対象パターン**:
-   - **ルーティング追加**: `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` など、フレームワーク規約でルートを定義するファイルの新規追加（`git diff main...HEAD --diff-filter=A --name-only` で新規ファイルのみ抽出）
+   - **ルーティング追加**: `page.tsx`, `page.jsx`, `page.ts`, `page.js`, `route.tsx`, `route.ts` など、フレームワーク規約でルートを定義するファイルの新規追加（`git diff <base>...HEAD --diff-filter=A --name-only` で新規ファイルのみ抽出）
    - **スキル追加**: `.claude/skills/` 配下のファイル追加・変更
    - **設定ファイル変更**: プロジェクトルート直下の設定ファイル（`*.config.*`, `.*rc`, `.*rc.*`, `tsconfig*.json`, `package.json` の `scripts` セクション等）の変更
 
@@ -99,11 +111,11 @@ description: Create a GitHub PR from the current branch - analyze changes, check
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    ```
 
-3. `gh pr create --base main --title "..." --body "..."` でPRを作成する
+3. `gh pr create --base <base> --title "..." --body "..."` でPRを作成する
    - bodyはheredocを使用してフォーマットを保持する:
 
      ```bash
-     gh pr create --base main --title "<タイトル>" --body "$(cat <<'EOF'
+     gh pr create --base <base> --title "<タイトル>" --body "$(cat <<'EOF'
      <本文>
      EOF
      )"

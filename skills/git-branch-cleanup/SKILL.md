@@ -20,9 +20,9 @@ This skill assumes a parallel development workflow where Claude Code and Codex e
 All operations are pre-approved when the user explicitly runs `/git-branch-cleanup`. Strictly follow these rules:
 
 - **Execute all operations in a single Bash tool call command chain. Never split into multiple Bash tool calls**
-- Treat `git checkout main`, `git worktree remove`, `git branch -D`, `git fetch origin`, and `git pull --ff-only origin main` as pre-approved operations
+- Treat `gh pr view`, `git checkout <home>`, `git worktree remove`, `git branch -D`, `git fetch origin`, and `git pull --ff-only origin <home>` as pre-approved operations
 - Do not insert confirmation prompts like "Proceed?" or "Continue?" between steps
-- Stop only when an error occurs, or when the skill detects "nothing to clean" (primary worktree on `main`)
+- Stop only when an error occurs, or when the skill detects "nothing to clean" (current branch is a protected `main`/`develop` branch)
 
 ## Execution Command
 
@@ -33,13 +33,17 @@ set -e
 STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then echo "エラー: 未コミットの変更があります。"; exit 1; fi
 BRANCH=$(git branch --show-current)
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "develop" ]; then
+  echo "対象なし: $BRANCH は保護ブランチのため削除対象がありません。"; exit 0
+fi
+HOME=$(gh pr view "$BRANCH" --json baseRefName -q .baseRefName 2>/dev/null || true)
+if [ -z "$HOME" ]; then HOME=main; fi
 GITDIR=$(git rev-parse --git-dir)
 COMMONDIR=$(git rev-parse --git-common-dir)
 if [ "$GITDIR" = "$COMMONDIR" ]; then
-  if [ "$BRANCH" = "main" ]; then echo "対象なし: 主 worktree の main にいるため削除対象がありません。"; exit 0; fi
-  git checkout main
+  git checkout "$HOME"
   git branch -D "$BRANCH"
-  git pull --ff-only origin main
+  git pull --ff-only origin "$HOME"
 else
   WORKTREE_PATH=$(git rev-parse --show-toplevel)
   MAIN_PATH=$(git worktree list --porcelain | awk '/^worktree/{print $2; exit}')
@@ -50,6 +54,8 @@ else
 fi
 ```
 
+The return target (`HOME`) is resolved from the merged PR's `baseRefName` via `gh pr view`, so cleanup returns to whichever branch the PR targeted (`main` or `develop`). If the PR cannot be found, it falls back to `main`. Both `main` and `develop` are protected: when the current branch is either, the skill reports "対象なし" and deletes nothing.
+
 ## Steps (Reference)
 
 ### Step 1: Check Prerequisites
@@ -57,14 +63,15 @@ fi
 1. Check for uncommitted changes in the current worktree with `git status --porcelain`
    - If changes exist → display error and exit
 2. Record the working branch with `git branch --show-current`
-3. Detect whether the current worktree is the **primary worktree** (main clone) or a **linked worktree** by comparing `git rev-parse --git-dir` and `git rev-parse --git-common-dir` (equal → primary, differ → linked)
+3. If the current branch is `main` or `develop` → display `対象なし: <branch> は保護ブランチのため削除対象がありません。` and exit. Both are protected and never deleted.
+4. Resolve the return target (`HOME`) from the merged PR's base with `gh pr view <working branch> --json baseRefName -q .baseRefName`. If the PR cannot be found, fall back to `main`.
+5. Detect whether the current worktree is the **primary worktree** (main clone) or a **linked worktree** by comparing `git rev-parse --git-dir` and `git rev-parse --git-common-dir` (equal → primary, differ → linked)
 
 ### Step 2A: Primary Worktree
 
 If the current worktree is the primary worktree (the main clone):
 
-1. If the current branch is `main` → display `対象なし: 主 worktree の main にいるため削除対象がありません。` and exit. Do not touch any other branch or worktree.
-2. Otherwise → `git checkout main`, then `git branch -D <working branch>`, then `git pull --ff-only origin main` to fast-forward the local `main` to `origin/main`. If the local `main` has unexpected commits ahead of `origin/main`, `--ff-only` causes the pull to fail so the user notices.
+1. `git checkout <home>`, then `git branch -D <working branch>`, then `git pull --ff-only origin <home>` to fast-forward the local `<home>` (the PR's base, `main` or `develop`) to `origin/<home>`. If the local `<home>` has unexpected commits ahead of `origin/<home>`, `--ff-only` causes the pull to fail so the user notices.
 
 ### Step 2B: Linked Worktree
 
@@ -79,8 +86,8 @@ If the current worktree is a linked worktree:
 
 ### Step 3: Refresh Remote Refs
 
-- **Primary worktree branch**: the local `main` working copy is already fast-forwarded to `origin/main` by Step 2A's `git pull --ff-only origin main`.
-- **Linked worktree branch**: run `git fetch origin` to update remote-tracking refs only. The primary worktree's checked-out branch (which may or may not be `main`) is **not** touched — the user updates it when they next switch to that worktree.
+- **Primary worktree branch**: the local `<home>` working copy is already fast-forwarded to `origin/<home>` by Step 2A's `git pull --ff-only origin <home>`.
+- **Linked worktree branch**: run `git fetch origin` to update remote-tracking refs only. The primary worktree's checked-out branch (which may or may not be `<home>`) is **not** touched — the user updates it when they next switch to that worktree.
 
 ### Step 4: Display Results
 
@@ -94,4 +101,4 @@ Display results in the following format:
 - git fetch origin: <結果サマリ>
 ```
 
-If the skill exited at Step 2A as "対象なし", report that instead and skip the deletion lines.
+If the skill exited at Step 1 as "対象なし" (current branch is `main`/`develop`), report that instead and skip the deletion lines.

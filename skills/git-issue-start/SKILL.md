@@ -63,9 +63,25 @@ Validate the following based on the "Mandatory Issue Labels" section in the shar
    - Assign it with `gh issue edit <Issue number> --add-label "<label>"` based on the user's response
 4. If both are present, proceed to the next step
 
-### Step 4: Create and Checkout Branch
+### Step 4: Determine Base Branch and Prefix
 
-1. Determine the prefix from the type label based on the "Branch Naming Convention" in the shared development conventions (`conventions.md`):
+This skill auto-detects the base branch so it works for both `main`-only repositories (backward compatible) and `main` + `develop` (git-flow lite) repositories.
+
+1. Detect whether `origin` has a `develop` branch:
+   - Run `git ls-remote --heads origin develop`
+   - Non-empty output → `develop` exists; empty → it does not
+
+2. Determine the base branch and prefix:
+
+   | `develop` on origin | Issue has `hotfix` label | Base branch | Prefix                              |
+   |---------------------|--------------------------|-------------|-------------------------------------|
+   | No                  | (any)                    | `main`      | from the type-label table below     |
+   | Yes                 | Yes                      | `main`      | `hotfix/`                           |
+   | Yes                 | No                       | `develop`   | from the type-label table below     |
+
+   When `develop` does not exist, behavior is unchanged from before: base is `main` and a `hotfix` label has no effect.
+
+3. Type-label prefix table (used unless `hotfix/` applies), based on the "Branch Naming Convention" in the shared development conventions (`conventions.md`):
 
    | Label           | Prefix         |
    |-----------------|----------------|
@@ -75,13 +91,13 @@ Validate the following based on the "Mandatory Issue Labels" section in the shar
    | `documentation` | `docs/`        |
    | `chore`         | `chore/`       |
 
-2. Generate a branch name from the Issue title:
+4. Generate a branch name from the Issue title:
    - If the title is in Japanese, convert it to English
    - Use kebab-case (lowercase English separated by hyphens)
    - Format: `<prefix><concise-description>`
-3. Create the branch directly with the generated name:
-   - Switch to main branch: `git checkout main`
-   - Pull latest: `git pull`
+5. Create the branch directly with the generated name:
+   - Switch to the base branch: `git checkout <base>`
+   - Pull latest: `git pull --ff-only`
    - Create and checkout branch: `git checkout -b <branch name>`
 
 ### Step 5: Project-Specific Scaffold (Conditional)
