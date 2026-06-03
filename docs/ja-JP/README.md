@@ -71,6 +71,8 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 
 `/config-github-sync` スキルを使って、Issueテンプレート、ワークフローファイル、CI設定テンプレートをリポジトリにコピーする。
 
+共通ワークフローには `close-linked-issues-on-develop.yml` が含まれる。`develop` 向けの PR がマージされたとき、PR 本文の `Closes #N` 等から紐づく Issue を自動クローズする（GitHub ネイティブの自動クローズがデフォルトブランチ以外では発火しない問題を補う）。`develop` ブランチを使わないリポジトリでは何も起こらない。
+
 ## 利用可能なスキル
 
 | スキル | コマンド | 説明 |

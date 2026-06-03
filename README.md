@@ -71,6 +71,8 @@ The `/config-claude-sync` skill also merges shared hook entries from `hooks/shar
 
 Use the `/config-github-sync` skill to copy Issue templates, workflow files, and CI configuration templates to your repository.
 
+The shared workflows include `close-linked-issues-on-develop.yml`, which automatically closes the linked Issues (`Closes #N`, etc.) when a PR targeting `develop` is merged — covering the case GitHub's native auto-close does not handle for non-default branches. It does nothing in repositories that do not use a `develop` branch.
+
 ## Available Skills
 
 | Skill | Command | Description |
