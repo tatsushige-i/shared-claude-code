@@ -95,10 +95,30 @@ This skill auto-detects the base branch so it works for both `main`-only reposit
    - If the title is in Japanese, convert it to English
    - Use kebab-case (lowercase English separated by hyphens)
    - Format: `<prefix><concise-description>`
-5. Create the branch directly with the generated name:
-   - Switch to the base branch: `git checkout <base>`
-   - Pull latest: `git pull --ff-only`
-   - Create and checkout branch: `git checkout -b <branch name>`
+5. Decide the work location based on the existing clone's **current branch**
+   (`git branch --show-current`). This prevents disturbing a clone that another
+   parallel agent is already working in:
+
+   - **Current branch is `main` or `develop` (the clone is idle)**: create the
+     branch directly in the existing clone (unchanged from before):
+     - Switch to the base branch: `git checkout <base>`
+     - Pull latest: `git pull --ff-only`
+     - Create and checkout branch: `git checkout -b <branch name>`
+
+   - **Current branch is anything else (the clone is occupied by other in-flight
+     work)**: do **not** touch the existing clone. Create an isolated git worktree
+     from `<base>` instead:
+     - If the project provides a worktree helper script, prefer it
+       (e.g. `scripts/dev/create_worktree.sh <issue-number> <branch name> <base>`).
+     - Otherwise: `git fetch origin`, then
+       `git worktree add ../<repo>-<issue-number> -b <branch name> origin/<base>`.
+     - The current session's cwd remains the original clone, so tell the user to
+       **open the new worktree directory and continue work there** (re-run the
+       skill / enter Plan Mode from that worktree). If the project documents a
+       parallel worktree workflow, point the user to it.
+
+   Backward compatibility: repositories whose clone always sits on `main` (or that
+   have no `develop`) always take the idle path, so behavior is unchanged for them.
 
 ### Step 5: Project-Specific Scaffold (Conditional)
 
