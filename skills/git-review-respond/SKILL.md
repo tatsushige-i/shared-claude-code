@@ -1,7 +1,7 @@
 ---
 name: git-review-respond
 description: Respond to GitHub PR review comments - analyze, fix code, and reply to each comment
-argument-hint: "<PR number>"
+argument-hint: "[PR number]"
 ---
 
 # PR Review Comment Response Skill
@@ -13,7 +13,21 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
 ### Step 1: Determine PR Number
 
 - If `$ARGUMENTS` is specified as a number, use that PR number
-- If not specified or not a number, ask the user for the PR number:
+- If `$ARGUMENTS` is empty (no argument), infer the PR from the current branch:
+  - Run `gh pr view --json number,state,headRefName,title,url` (resolves the PR associated with the current branch)
+  - If a PR is found, announce it and use that PR number:
+
+    ```text
+    Using PR #XX associated with the current branch `<branch>`.
+    ```
+
+  - If no PR is found (the command fails, or the current branch has no PR), fall back to asking the user for the PR number:
+
+    ```text
+    Could not detect a PR from the current branch. Please provide the PR number you'd like to address.
+    ```
+
+- If `$ARGUMENTS` is specified but is not a number, ask the user for the PR number:
 
   ```text
   Please provide the PR number you'd like to address.

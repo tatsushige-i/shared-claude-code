@@ -1,7 +1,7 @@
 ---
 name: git-review-respond
 description: Respond to GitHub PR review comments - analyze, fix code, and reply to each comment
-argument-hint: "<PR number>"
+argument-hint: "[PR number]"
 ---
 
 # PR Review Comment Response Skill
@@ -13,7 +13,21 @@ GitHub PRのレビューコメントを取得・分析し、コード修正・�
 ### Step 1: PR番号の特定
 
 - `$ARGUMENTS` が数値として指定されていればそのPR番号を使用する
-- 未指定または数値でない場合、ユーザーにPR番号を尋ねる:
+- `$ARGUMENTS` が空（引数なし）の場合、現在のブランチからPRを自動判定する:
+  - `gh pr view --json number,state,headRefName,title,url`（現在のブランチに紐づくPRを解決）を実行する
+  - PRが見つかれば、それを提示してそのPR番号を使用する:
+
+    ```text
+    現在のブランチ `<branch>` の PR #XX を対象とします。
+    ```
+
+  - PRが見つからない場合（コマンドが失敗、または現在のブランチにPRがない場合）、従来どおりユーザーにPR番号を尋ねる:
+
+    ```text
+    現在のブランチからPRを検出できませんでした。対応するPRの番号を教えてください。
+    ```
+
+- `$ARGUMENTS` が指定されているが数値でない場合、ユーザーにPR番号を尋ねる:
 
   ```text
   対応するPRの番号を教えてください。
