@@ -47,7 +47,8 @@ if [ "$GITDIR" = "$COMMONDIR" ]; then
 else
   WORKTREE_PATH=$(git rev-parse --show-toplevel)
   MAIN_PATH=$(git worktree list --porcelain | awk '/^worktree/{print $2; exit}')
-  cd "$MAIN_PATH"
+  if [ -z "$MAIN_PATH" ] || [ ! -d "$MAIN_PATH" ]; then echo "エラー: 主 worktree のパスを解決できません ($MAIN_PATH)。"; exit 1; fi
+  cd "$MAIN_PATH" || { echo "エラー: 主 worktree への移動に失敗しました ($MAIN_PATH)。"; exit 1; }
   git worktree remove "$WORKTREE_PATH"
   git branch -D "$BRANCH"
   git fetch origin
@@ -79,7 +80,7 @@ If the current worktree is a linked worktree:
 
 1. Capture the worktree path with `git rev-parse --show-toplevel`.
 2. Capture the primary worktree path from the first `worktree` line of `git worktree list --porcelain`.
-3. `cd` into the primary worktree.
+3. Validate that the primary worktree path is non-empty and exists, then `cd` into it. If the path is invalid or the `cd` fails, abort immediately — never proceed to `git worktree remove` while the CWD is still inside the worktree being removed, or it will delete the current worktree from the inside and leave the branch undeleted.
 4. `git worktree remove <linked worktree path>` to remove the worktree directory.
 5. `git branch -D <working branch>` to delete the branch.
 6. Other linked worktrees and their branches are left alone.
