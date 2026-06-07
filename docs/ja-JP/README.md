@@ -19,6 +19,7 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── git-issue-create/   # 会話コンテキストからGitHub Issueを作成
 ├── git-issue-start/    # GitHub Issueからの作業開始ワークフロー
 ├── git-pr-create/      # 分析付きGitHub PR作成
+├── git-pr-finalize/    # CI/レビュー監視・指摘対応・マージ・整理
 ├── git-review-respond/ # PRレビューコメントへの対応
 ├── tech-debt-audit-flutter/ # Flutter / Dartプロジェクトの技術的負債調査
 └── tech-debt-audit-nextjs/ # Next.jsプロジェクトの技術的負債調査
@@ -58,6 +59,7 @@ ln -s ../../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-b
 ln -s ../../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
 ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
 ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-finalize
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
@@ -83,6 +85,7 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 | `git-issue-create` | `/git-issue-create` | 会話の文脈からIssue作成（タイトル・本文・ラベル推定・プレビュー） |
 | `git-issue-start` | `/git-issue-start <Issue#>` | Issue取得・ラベル検証・ブランチ作成・Plan Mode移行 |
 | `git-pr-create` | `/git-pr-create` | Issue特定・規模チェック・差分分析・PR作成 |
+| `git-pr-finalize` | `/git-pr-finalize [PR#]` | CI/Copilotレビュー監視・指摘対応・確認後マージ・ブランチ整理 |
 | `git-review-respond` | `/git-review-respond <PR#>` | レビューコメント分析・コード修正・返信 |
 | `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Flutter / Dartプロジェクトの技術的負債調査・優先度付きレポート生成 |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Next.js（App Router）プロジェクトの技術的負債調査・優先度付きレポート生成 |

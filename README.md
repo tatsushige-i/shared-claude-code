@@ -19,6 +19,7 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── git-issue-create/   # Create GitHub Issue from conversation context
 ├── git-issue-start/    # Start workflow from GitHub Issue
 ├── git-pr-create/      # Create GitHub PR with analysis
+├── git-pr-finalize/    # Watch CI/review, address findings, merge, clean up
 ├── git-review-respond/ # Respond to PR review comments
 ├── tech-debt-audit-flutter/ # Audit technical debt in Flutter / Dart projects
 └── tech-debt-audit-nextjs/ # Audit technical debt in Next.js projects
@@ -58,6 +59,7 @@ ln -s ../../../shared-claude-code/skills/git-branch-cleanup .claude/skills/git-b
 ln -s ../../../shared-claude-code/skills/git-issue-create .claude/skills/git-issue-create
 ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issue-start
 ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
+ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-finalize
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
@@ -83,6 +85,7 @@ The shared workflows include `close-linked-issues-on-develop.yml`, which automat
 | `git-issue-create` | `/git-issue-create` | Create Issue from conversation context (title, body, label inference, preview) |
 | `git-issue-start` | `/git-issue-start <Issue#>` | Fetch Issue, validate labels, create branch, enter Plan Mode |
 | `git-pr-create` | `/git-pr-create` | Identify Issue, check size limits, analyze diff, create PR |
+| `git-pr-finalize` | `/git-pr-finalize [PR#]` | Watch CI/Copilot review, address findings, merge after confirmation, clean up branches |
 | `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
 | `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Audit technical debt in Flutter / Dart projects with prioritized report |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Audit technical debt in Next.js (App Router) projects with prioritized report |
