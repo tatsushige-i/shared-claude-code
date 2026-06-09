@@ -69,7 +69,7 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
    gh api repos/{owner}/{repo}/pulls/<PR number>/comments --paginate
    ```
 
-2. Fetch resolved thread comment IDs via GraphQL API:
+2. Fetch review threads via GraphQL API, including thread-level node IDs:
 
    ```graphql
    query {
@@ -77,6 +77,7 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
        pullRequest(number: <PR number>) {
          reviewThreads(first: 100) {
            nodes {
+             id
              isResolved
              comments(first: 100) {
                nodes {
@@ -89,6 +90,8 @@ Fetch and analyze GitHub PR review comments, then perform code fixes, commits, a
      }
    }
    ```
+
+   **Note**: Extract the `id` field at the thread level (the GraphQL node ID, not the database ID). Build a mapping: `{commentDatabaseId → threadId}` for later thread resolution.
 
 3. Exclude the following comments:
    - Comments with `in_reply_to_id` set (reply comments)
@@ -187,18 +190,37 @@ If any check fails, fix the issue and re-run.
 
 **Note**: If there are no "Needs fix" comments and no code changes, skip this step.
 
-### Step 9: Reply to Comments
+### Step 9: Reply to Comments and Resolve Threads
 
 Use the reply drafts approved in Step 5. Adjust only if the actual fix in Step 6 diverged from the planned approach.
 
-Reply to each comment using `gh api`. Post replies in the same thread as the original comment:
+For each comment, perform the following:
 
-```bash
-gh api repos/{owner}/{repo}/pulls/<PR number>/comments \
-  -method POST \
-  -f body="<reply body>" \
-  -F in_reply_to=<original comment ID>
-```
+1. **Post the reply** using `gh api`. Post replies in the same thread as the original comment:
+
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/<PR number>/comments \
+     -method POST \
+     -f body="<reply body>" \
+     -F in_reply_to=<original comment ID>
+   ```
+
+2. **Resolve the thread** immediately after posting the reply:
+
+   ```bash
+   gh api graphql -f query='
+     mutation {
+       resolveReviewThread(input: {threadId: "<thread node ID>"}) {
+         thread {
+           isResolved
+         }
+       }
+     }
+   '
+   ```
+
+   - Use the thread node ID extracted in Step 3 (the `id` field from the GraphQL `reviewThreads` query)
+   - If the mutation fails, log a warning but continue (the reply is already posted; thread can be resolved manually if needed)
 
 Reply content guidelines:
 
@@ -239,6 +261,9 @@ PR #XX: <title>
 - Explained: X
 - No action needed: X
 - Skipped: X (reason: file deleted, etc.)
+- Resolved threads: X
 
 Commit: <commit hash>
 ```
+
+**Note**: All replied-to threads are automatically resolved via GraphQL mutation in Step 9. The count reflects the number of threads successfully resolved.

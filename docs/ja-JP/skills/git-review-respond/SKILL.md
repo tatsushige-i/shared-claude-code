@@ -69,7 +69,7 @@ GitHub PRのレビューコメントを取得・分析し、コード修正・�
    gh api repos/{owner}/{repo}/pulls/<PR番号>/comments --paginate
    ```
 
-2. GraphQL APIで解決済み（resolved）スレッドのコメントIDを取得:
+2. GraphQL APIでレビュースレッドを取得（スレッドレベルのノードID含む）:
 
    ```graphql
    query {
@@ -77,6 +77,7 @@ GitHub PRのレビューコメントを取得・分析し、コード修正・�
        pullRequest(number: <PR番号>) {
          reviewThreads(first: 100) {
            nodes {
+             id
              isResolved
              comments(first: 100) {
                nodes {
@@ -89,6 +90,8 @@ GitHub PRのレビューコメントを取得・分析し、コード修正・�
      }
    }
    ```
+
+   **注記**: スレッドレベルの `id` フィールド（GraphQL node ID）を抽出し、後でスレッド解決に使用するためのマッピング `{コメントdatabaseId → スレッドId}` を作成する。
 
 3. 以下のコメントを除外:
    - `in_reply_to_id` が設定されているコメント（返信コメント）
@@ -187,18 +190,37 @@ PR #XX: <タイトル>
 
 **注意**: 「要修正」コメントがなくコード変更がない場合、このステップはスキップする。
 
-### Step 9: コメント返信
+### Step 9: コメント返信とスレッド解決
 
 Step 5 で承認された返信ドラフトをそのまま使用する。Step 6 の実際の修正内容が当初の方針から乖離した場合のみ調整する。
 
-各コメントに対して `gh api` で返信する。返信は元のコメントと同じスレッドに投稿する:
+各コメントに対して以下を実施する:
 
-```bash
-gh api repos/{owner}/{repo}/pulls/<PR番号>/comments \
-  -method POST \
-  -f body="<返信内容>" \
-  -F in_reply_to=<元コメントのID>
-```
+1. **返信を投稿** - `gh api` で返信する。返信は元のコメントと同じスレッドに投稿する:
+
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/<PR番号>/comments \
+     -method POST \
+     -f body="<返信内容>" \
+     -F in_reply_to=<元コメントのID>
+   ```
+
+2. **スレッドを解決** - 返信投稿直後に、GraphQL mutation でスレッドを解決する:
+
+   ```bash
+   gh api graphql -f query='
+     mutation {
+       resolveReviewThread(input: {threadId: "<スレッドのnode ID>"}) {
+         thread {
+           isResolved
+         }
+       }
+     }
+   '
+   ```
+
+   - Step 3 で抽出したスレッドのnode ID（GraphQLクエリの `id` フィールド）を使用する
+   - mutationに失敗した場合は警告をログして続行する（返信は既に投稿されているため、スレッドは手動で解決可能）
 
 返信内容のガイドライン:
 
@@ -239,6 +261,9 @@ PR #XX: <タイトル>
 - 説明返信: X件
 - 対応不要: X件
 - スキップ: X件（理由: ファイル削除済みなど）
+- 解決済みスレッド: X件
 
 コミット: <コミットハッシュ>
 ```
+
+**注記**: 返信が投稿されたすべてのスレッドは Step 9 の GraphQL mutation で自動的に解決される。カウントは正常に解決されたスレッド数を表す。
