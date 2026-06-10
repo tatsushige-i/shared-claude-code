@@ -46,7 +46,7 @@ if [ "$GITDIR" = "$COMMONDIR" ]; then
   git pull --ff-only origin "$HOME"
 else
   WORKTREE_PATH=$(git rev-parse --show-toplevel)
-  MAIN_PATH=$(git worktree list --porcelain | awk '/^worktree/{print $2; exit}')
+  MAIN_PATH=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
   cd "$MAIN_PATH"
   git worktree remove "$WORKTREE_PATH"
   git branch -D "$BRANCH"

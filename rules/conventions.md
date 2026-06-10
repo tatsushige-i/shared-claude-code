@@ -105,6 +105,10 @@ When adding a new skill to `.claude/skills/`, update `.claude/skills/README.md` 
 - Character constraints: lowercase letters, digits, and hyphens only (max 64 characters)
 - Avoid overlapping with existing categories when adding new ones
 
+## Skill Embedded Script Constraints
+
+Claude Code substitutes `$ARGUMENTS` and `$<digit>` (`$1`, `$2`, ...) in a skill body with invocation arguments at load time — even for skills that take no arguments. Never write these literals in scripts embedded in SKILL.md; they are silently replaced (typically with an empty string) and corrupt the script. Use alternatives that avoid positional fields, e.g. `sed -n 's/^prefix //p'` or `cut` instead of `awk '{print $<n>}'`.
+
 ## Minimal Change Principle
 
 - Make only the minimum changes necessary to achieve the task objective
