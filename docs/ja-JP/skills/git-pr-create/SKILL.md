@@ -11,12 +11,15 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 ### Step 0: base ブランチの解決
 
-以降の処理が `main` のみのリポジトリ（後方互換）でも `main` + `develop`（git-flow ライト）のリポジトリでも動作するよう、最初に base ブランチを解決する。以降の `<base>` には解決した値を使用する。
+以降の処理が `main` のみのリポジトリ（後方互換）でも、`main` + `develop`（git-flow ライト）のリポジトリでも、`release/*` ブランチを持つリポジトリ（標準 Git Flow）でも動作するよう、最初に base ブランチを解決する。以降の `<base>` には解決した値を使用する。
 
 1. `git branch --show-current` で現在のブランチを取得する
-2. `<base>` を決定する:
+2. `<base>` を決定する（最初に一致したルールを採用）:
    - 現在のブランチが `hotfix/` で始まる → `<base>` = `main`
+   - それ以外 → 現在のブランチの派生元 `release/*` ブランチを検出する: `git ls-remote --heads origin 'release/*'` で release ブランチを列挙する。存在する場合は `git fetch origin` を実行（tip をローカルに取得）してから、各 release ブランチ `R` について `git merge-base --is-ancestor origin/<R> HEAD` を判定する。`HEAD` の祖先である（現在のブランチがそこから切られた）release ブランチのうち、`HEAD` との分岐点が最も新しい（最も近い祖先）ものを `<base>` = その release ブランチとする
    - それ以外 → `git ls-remote --heads origin develop` を実行し、`develop` があれば `<base>` = `develop`、なければ `<base>` = `main`
+
+後方互換: `HEAD` の祖先である `release/*` ブランチがなく `develop` も存在しない場合、`<base>` は従来どおり `main` にフォールバックする。
 
 ### Step 1: 前提条件の確認
 
@@ -67,7 +70,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
    | `docs/`        | `docs:`                  |
    | `chore/`       | `chore:`                 |
 
-   base に関する補足: `hotfix/` は `main`（緊急の本番修正）を対象とし、`bugfix/` やその他のプレフィックスは `develop` があれば `develop` を、なければ `main` を対象とする。base は Step 0 で解決済み。
+   base に関する補足: `hotfix/` は `main`（緊急の本番修正）を対象とし、`release/*` ブランチから切られたブランチはその release ブランチ（リリース準備・リジェクト対応）を対象とする。それ以外の `bugfix/` やその他のプレフィックスは `develop` があれば `develop` を、なければ `main` を対象とする。base は Step 0 で解決済み。
 
 ### Step 5: ドキュメント整合性チェック
 

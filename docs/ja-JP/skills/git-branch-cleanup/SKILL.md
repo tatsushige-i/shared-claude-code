@@ -22,7 +22,7 @@ PR マージ後に **現在の worktree** と **そこで checkout している�
 - **全操作を 1 つの Bash tool call のコマンドチェーンで実行する。Bash tool call を分割してはならない**
 - `gh pr view`, `git checkout <home>`, `git worktree remove`, `git branch -D`, `git fetch origin`, `git pull --ff-only origin <home>` はすべて事前承認済みの操作として扱う
 - ステップ間で「実行してよいですか？」「続行しますか？」等の質問を挟まない
-- エラーが発生した場合、または「対象なし（現在ブランチが保護対象の `main`/`develop`）」を検出した場合のみ停止する
+- エラーが発生した場合、または「対象なし（現在ブランチが保護対象の `main`/`develop`/`release/*`）」を検出した場合のみ停止する
 
 ## 実行コマンド
 
@@ -33,9 +33,10 @@ set -e
 STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then echo "エラー: 未コミットの変更があります。"; exit 1; fi
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "develop" ]; then
-  echo "対象なし: $BRANCH は保護ブランチのため削除対象がありません。"; exit 0
-fi
+case "$BRANCH" in
+  main|develop|release/*)
+    echo "対象なし: $BRANCH は保護ブランチのため削除対象がありません。"; exit 0 ;;
+esac
 HOME=$(gh pr view "$BRANCH" --json baseRefName -q .baseRefName 2>/dev/null || true)
 if [ -z "$HOME" ]; then HOME=main; fi
 GITDIR=$(git rev-parse --git-dir)
@@ -54,7 +55,7 @@ else
 fi
 ```
 
-戻り先（`HOME`）はマージ済み PR の `baseRefName` を `gh pr view` で取得して確定するため、PR が対象としたブランチ（`main` または `develop`）に戻る。PR が見つからない場合は `main` にフォールバックする。`main` と `develop` の両方を保護対象とし、現在ブランチがいずれかの場合は「対象なし」を表示して何も削除しない。
+戻り先（`HOME`）はマージ済み PR の `baseRefName` を `gh pr view` で取得して確定するため、PR が対象としたブランチ（`main`・`develop`・`release/*` ブランチ）に戻る。PR が見つからない場合は `main` にフォールバックする。`main`・`develop`・`release/*` を保護対象とし、現在ブランチがいずれかの場合は「対象なし」を表示して何も削除しない。マージ済み `release/*` ブランチの削除は本スキルではなくリリースフロー側の責務とする。
 
 ## 処理手順（参考）
 
@@ -63,7 +64,7 @@ fi
 1. 現在の worktree で `git status --porcelain` を実行し、未コミット変更を確認する
    - 変更がある場合 → エラーを表示して終了する
 2. `git branch --show-current` で作業ブランチ名を保持する
-3. 現在ブランチが `main` または `develop` → `対象なし: <ブランチ> は保護ブランチのため削除対象がありません。` を表示して終了する。両方とも保護対象で、削除しない。
+3. 現在ブランチが `main`・`develop`・`release/*` のいずれか → `対象なし: <ブランチ> は保護ブランチのため削除対象がありません。` を表示して終了する。いずれも保護対象で削除しない。マージ済み `release/*` ブランチの削除はリリースフロー側の責務とする。
 4. マージ済み PR の base から戻り先（`HOME`）を `gh pr view <作業ブランチ> --json baseRefName -q .baseRefName` で確定する。PR が見つからない場合は `main` にフォールバックする。
 5. `git rev-parse --git-dir` と `git rev-parse --git-common-dir` を比較して、現在の worktree が **主 worktree（メインクローン）** か **linked worktree** かを判定する（一致 → 主、不一致 → linked）
 
