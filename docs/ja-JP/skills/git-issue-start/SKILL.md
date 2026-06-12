@@ -65,21 +65,23 @@ GitHub Issueの情報取得・ラベル検証・ブランチ作成・Plan Mode�
 
 ### Step 4: base ブランチとプレフィックスの決定
 
-このスキルは base ブランチを自動判定し、`main` のみのリポジトリ（後方互換）でも `main` + `develop`（git-flow ライト）のリポジトリでも動作する。
+このスキルは base ブランチを自動判定し、`main` のみのリポジトリ（後方互換）でも、`main` + `develop`（git-flow ライト）のリポジトリでも、`release/*` ブランチを持つリポジトリ（標準 Git Flow）でも動作する。
 
-1. `origin` に `develop` ブランチがあるか検出する:
-   - `git ls-remote --heads origin develop` を実行する
-   - 出力が非空 → `develop` あり、空 → なし
+1. `origin` で利用可能な統合ブランチを検出する:
+   - `develop`: `git ls-remote --heads origin develop` を実行（出力が非空 → あり）
+   - `release/*`: `git ls-remote --heads origin 'release/*'` を実行（出力が非空 → 1 つ以上あり）
 
-2. base ブランチとプレフィックスを決定する:
+2. base ブランチとプレフィックスを決定する（最初に一致したルールを採用）:
 
-   | origin の `develop` | Issue に `hotfix` ラベル | base ブランチ | プレフィックス               |
-   |---------------------|--------------------------|---------------|------------------------------|
-   | なし                | （不問）                 | `main`        | 下の種類ラベル表に従う       |
-   | あり                | あり                     | `main`        | `hotfix/`                    |
-   | あり                | なし                     | `develop`     | 下の種類ラベル表に従う       |
+   | # | 条件                                                         | base ブランチ        | プレフィックス             |
+   |---|--------------------------------------------------------------|----------------------|----------------------------|
+   | 1 | Issue に `hotfix` ラベル **かつ** `develop` が存在            | `main`               | `hotfix/`                  |
+   | 2 | Issue に `release` ラベル **かつ** `release/*` が 1 つ以上存在 | 最新の `release/*`   | 下の種類ラベル表に従う     |
+   | 3 | `develop` が存在                                             | `develop`            | 下の種類ラベル表に従う     |
+   | 4 | それ以外                                                     | `main`               | 下の種類ラベル表に従う     |
 
-   `develop` が存在しない場合は従来どおりの挙動：base は `main`、`hotfix` ラベルがあっても効果はない。
+   - 最新の `release/*`（ルール 2）はバージョン番号が最大のもの: `git ls-remote --heads origin 'release/*' | sed -n 's#.*refs/heads/##p' | sort -V | tail -n 1`。
+   - 後方互換: `develop` も `release/*` も持たないリポジトリは常にルール 4（base は `main`）に落ちるため、従来どおりの挙動。`release` ラベルは `release/*` ブランチが存在しない限り効果がなく、`hotfix` ラベルは `develop` が存在しない限り効果がない。
 
 3. 種類ラベルのプレフィックス表（`hotfix/` が適用されない場合に使用）。共通開発規約（`conventions.md`）の「ブランチ命名規則」に基づく:
 

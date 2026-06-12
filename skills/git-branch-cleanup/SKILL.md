@@ -22,7 +22,7 @@ All operations are pre-approved when the user explicitly runs `/git-branch-clean
 - **Execute all operations in a single Bash tool call command chain. Never split into multiple Bash tool calls**
 - Treat `gh pr view`, `git checkout <home>`, `git worktree remove`, `git branch -D`, `git fetch origin`, and `git pull --ff-only origin <home>` as pre-approved operations
 - Do not insert confirmation prompts like "Proceed?" or "Continue?" between steps
-- Stop only when an error occurs, or when the skill detects "nothing to clean" (current branch is a protected `main`/`develop` branch)
+- Stop only when an error occurs, or when the skill detects "nothing to clean" (current branch is a protected `main`/`develop`/`release/*` branch)
 
 ## Execution Command
 
@@ -33,9 +33,10 @@ set -e
 STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then echo "エラー: 未コミットの変更があります。"; exit 1; fi
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "develop" ]; then
-  echo "対象なし: $BRANCH は保護ブランチのため削除対象がありません。"; exit 0
-fi
+case "$BRANCH" in
+  main|develop|release/*)
+    echo "対象なし: $BRANCH は保護ブランチのため削除対象がありません。"; exit 0 ;;
+esac
 HOME=$(gh pr view "$BRANCH" --json baseRefName -q .baseRefName 2>/dev/null || true)
 if [ -z "$HOME" ]; then HOME=main; fi
 GITDIR=$(git rev-parse --git-dir)
@@ -55,7 +56,7 @@ else
 fi
 ```
 
-The return target (`HOME`) is resolved from the merged PR's `baseRefName` via `gh pr view`, so cleanup returns to whichever branch the PR targeted (`main` or `develop`). If the PR cannot be found, it falls back to `main`. Both `main` and `develop` are protected: when the current branch is either, the skill reports "対象なし" and deletes nothing.
+The return target (`HOME`) is resolved from the merged PR's `baseRefName` via `gh pr view`, so cleanup returns to whichever branch the PR targeted (`main`, `develop`, or a `release/*` branch). If the PR cannot be found, it falls back to `main`. `main`, `develop`, and `release/*` are protected: when the current branch is any of them, the skill reports "対象なし" and deletes nothing. Deleting a merged `release/*` branch is the responsibility of the release flow, not this skill.
 
 ## Steps (Reference)
 
@@ -64,7 +65,7 @@ The return target (`HOME`) is resolved from the merged PR's `baseRefName` via `g
 1. Check for uncommitted changes in the current worktree with `git status --porcelain`
    - If changes exist → display error and exit
 2. Record the working branch with `git branch --show-current`
-3. If the current branch is `main` or `develop` → display `対象なし: <branch> は保護ブランチのため削除対象がありません。` and exit. Both are protected and never deleted.
+3. If the current branch is `main`, `develop`, or matches `release/*` → display `対象なし: <branch> は保護ブランチのため削除対象がありません。` and exit. All of them are protected and never deleted; deleting a merged `release/*` branch is the release flow's responsibility.
 4. Resolve the return target (`HOME`) from the merged PR's base with `gh pr view <working branch> --json baseRefName -q .baseRefName`. If the PR cannot be found, fall back to `main`.
 5. Detect whether the current worktree is the **primary worktree** (main clone) or a **linked worktree** by comparing `git rev-parse --git-dir` and `git rev-parse --git-common-dir` (equal → primary, differ → linked)
 

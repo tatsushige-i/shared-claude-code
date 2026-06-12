@@ -11,12 +11,15 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 ### Step 0: Resolve Base Branch
 
-Resolve the base branch first so the rest of the flow works for both `main`-only repositories (backward compatible) and `main` + `develop` (git-flow lite) repositories. Use the resolved value wherever `<base>` appears below.
+Resolve the base branch first so the rest of the flow works for `main`-only repositories (backward compatible), `main` + `develop` (git-flow lite) repositories, and repositories with `release/*` branches (standard Git Flow). Use the resolved value wherever `<base>` appears below.
 
 1. Get the current branch with `git branch --show-current`
-2. Determine `<base>`:
+2. Determine `<base>` (first matching rule wins):
    - If the current branch starts with `hotfix/` → `<base>` = `main`
-   - Otherwise → run `git ls-remote --heads origin develop`; if `develop` exists → `<base>` = `develop`, else → `<base>` = `main`
+   - Else, detect a `release/*` branch the current branch was cut from: list release branches with `git ls-remote --heads origin 'release/*'`. If any exist, run `git fetch origin` (so their tips are available locally), then for each release branch `R` test `git merge-base --is-ancestor origin/<R> HEAD`. Among the release branches that are ancestors of `HEAD` (the current branch was cut from them), pick the one whose merge-base with `HEAD` is the most recent (the closest ancestor) → `<base>` = that release branch
+   - Else → run `git ls-remote --heads origin develop`; if `develop` exists → `<base>` = `develop`, else → `<base>` = `main`
+
+Backward compatibility: when no `release/*` branch is an ancestor of `HEAD` and no `develop` exists, `<base>` falls back to `main`, unchanged from before.
 
 ### Step 1: Check Prerequisites
 
@@ -67,7 +70,7 @@ Search for the Issue automatically in the following order (do not ask the user):
    | `docs/`        | `docs:`        |
    | `chore/`       | `chore:`       |
 
-   Note on base: `hotfix/` targets `main` (urgent production fixes), while `bugfix/` and the other prefixes target `develop` when it exists (otherwise `main`). The base was already resolved in Step 0.
+   Note on base: `hotfix/` targets `main` (urgent production fixes); a branch cut from a `release/*` branch targets that release branch (release preparation / reject handling); otherwise `bugfix/` and the other prefixes target `develop` when it exists (otherwise `main`). The base was already resolved in Step 0.
 
 ### Step 5: Documentation Consistency Check
 

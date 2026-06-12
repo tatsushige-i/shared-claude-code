@@ -65,21 +65,23 @@ Validate the following based on the "Mandatory Issue Labels" section in the shar
 
 ### Step 4: Determine Base Branch and Prefix
 
-This skill auto-detects the base branch so it works for both `main`-only repositories (backward compatible) and `main` + `develop` (git-flow lite) repositories.
+This skill auto-detects the base branch so it works for `main`-only repositories (backward compatible), `main` + `develop` (git-flow lite) repositories, and repositories with `release/*` branches (standard Git Flow).
 
-1. Detect whether `origin` has a `develop` branch:
-   - Run `git ls-remote --heads origin develop`
-   - Non-empty output → `develop` exists; empty → it does not
+1. Detect the integration branches available on `origin`:
+   - `develop`: run `git ls-remote --heads origin develop` (non-empty output → exists)
+   - `release/*`: run `git ls-remote --heads origin 'release/*'` (non-empty output → one or more exist)
 
-2. Determine the base branch and prefix:
+2. Determine the base branch and prefix (first matching rule wins):
 
-   | `develop` on origin | Issue has `hotfix` label | Base branch | Prefix                              |
-   |---------------------|--------------------------|-------------|-------------------------------------|
-   | No                  | (any)                    | `main`      | from the type-label table below     |
-   | Yes                 | Yes                      | `main`      | `hotfix/`                           |
-   | Yes                 | No                       | `develop`   | from the type-label table below     |
+   | # | Condition                                                         | Base branch            | Prefix                          |
+   |---|-------------------------------------------------------------------|------------------------|---------------------------------|
+   | 1 | Issue has `hotfix` label **and** `develop` exists                 | `main`                 | `hotfix/`                       |
+   | 2 | Issue has `release` label **and** at least one `release/*` exists | the latest `release/*` | from the type-label table below |
+   | 3 | `develop` exists                                                  | `develop`              | from the type-label table below |
+   | 4 | Otherwise                                                         | `main`                 | from the type-label table below |
 
-   When `develop` does not exist, behavior is unchanged from before: base is `main` and a `hotfix` label has no effect.
+   - The latest `release/*` (rule 2) is the highest version: `git ls-remote --heads origin 'release/*' | sed -n 's#.*refs/heads/##p' | sort -V | tail -n 1`.
+   - Backward compatibility: repositories without `develop` and without `release/*` always fall through to rule 4 (base `main`), so behavior is unchanged. A `release` label has no effect unless a `release/*` branch exists, and a `hotfix` label has no effect unless `develop` exists.
 
 3. Type-label prefix table (used unless `hotfix/` applies), based on the "Branch Naming Convention" in the shared development conventions (`conventions.md`):
 
