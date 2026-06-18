@@ -26,6 +26,7 @@ skills/                 # Master skill definitions — symlinked into consuming 
 hooks/                  # Shared hook definitions — merged into consuming repos' settings.json via config-claude-sync
 └── shared-hooks.json   # Shared hooks for PreToolUse / Stop / UserPromptSubmit / etc.
 ci-templates/           # CI/config templates by language — copied to consuming repos
+├── flutter/            # Flutter template (test.yml: format / analyze / test / build_runner)
 └── nextjs/             # Next.js template (ESLint, Jest, TypeScript configs)
 .github/
 └── ISSUE_TEMPLATE/     # Issue templates (Japanese) — copied to consuming repos
