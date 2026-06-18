@@ -3,29 +3,46 @@ name: Test
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    if: github.event.pull_request.draft == false
+    # draft PR ではスキップ。push / workflow_dispatch では pull_request が無く draft は
+    # null になるため、`== false` ではなく `!= true` で判定する（null != true → 実行）。
+    if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Read Flutter version from .fvmrc
         id: fvm
         run: echo "flutter_version=$(jq -r '.flutter' .fvmrc)" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ steps.fvm.outputs.flutter_version }}
           channel: stable
           cache: true
 
       - run: flutter pub get
+
+      - name: Check for vulnerable dependencies
+        run: flutter pub get --enforce-lockfile
+        continue-on-error: true
 
       - name: Check formatting
         run: dart format --set-exit-if-changed .
@@ -35,7 +52,7 @@ jobs:
       - run: flutter test
 
       - name: Run build_runner
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Check no generated files changed
         run: git diff --exit-code
