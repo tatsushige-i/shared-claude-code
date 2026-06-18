@@ -3,9 +3,20 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   # プロジェクトで使用するNode.jsバージョン。EOLに達したら更新する。
@@ -13,13 +24,15 @@ env:
 
 jobs:
   eol-check:
-    if: github.event.pull_request.draft == false
+    # draft PR ではスキップ。push / workflow_dispatch では draft が null になるため
+    # `== false` ではなく `!= true` で判定する（null != true → 実行）。
+    if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -41,13 +54,13 @@ jobs:
         run: npm audit --omit=dev --audit-level=moderate
 
   lint:
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -57,13 +70,13 @@ jobs:
       - run: npm run lint
 
   test:
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -74,13 +87,13 @@ jobs:
 
   build:
     needs: [lint, test]
-    if: github.event.pull_request.draft == false
+    if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
