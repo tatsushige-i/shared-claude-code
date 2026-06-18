@@ -81,6 +81,7 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
    - `package.json` あり → Node.js 系。`dependencies.next` または `devDependencies.next` があれば **Next.js** と判定
    - `pyproject.toml` または `setup.py` あり → **Python**
    - `go.mod` あり → **Go**
+   - `pubspec.yaml` があり `flutter:` ブロックを含む → **Flutter**
    - `ci-templates/` 配下の利用可能なテンプレートディレクトリも候補として列挙する
 3. **候補を提示してユーザーに確認する**:
 
@@ -97,7 +98,7 @@ shared-claude-codeリポジトリの `.github/` 配下の共有資材（ISSUE_TE
 
    - 一致するテンプレートがない場合 → 利用可能なテンプレートを表示し、選択またはスキップを促す
 4. **選択されたテンプレートの差分を検出する**:
-   - `ci-templates/<lang>/.github/workflows/ci.yml` ↔ ローカルの `.github/workflows/ci.yml`
+   - `ci-templates/<lang>/.github/workflows/` 以下の全ファイル ↔ ローカルの `.github/workflows/` 内の同名ファイル
    - `ci-templates/<lang>/` 直下の各ファイル（`.github/` 以外）↔ ローカルのプロジェクトルートの同名ファイル
    - 各ファイルを **同一**・**差分あり**・**新規**・**ローカルのみ** に分類（Step 2 と同じ基準）
 5. **差分を提示してユーザーに確認する**:
