@@ -81,6 +81,7 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, PULL_REQUEST_TEMPLATE, work
    - `package.json` present → Node.js family. If `dependencies.next` or `devDependencies.next` is found → **Next.js**
    - `pyproject.toml` or `setup.py` present → **Python**
    - `go.mod` present → **Go**
+   - `pubspec.yaml` present AND contains `flutter:` block → **Flutter**
    - List available template directories under `ci-templates/` as additional candidates
 3. **Present candidates and confirm with the user**:
 
@@ -97,7 +98,7 @@ Sync shared assets under `.github/` (ISSUE_TEMPLATE, PULL_REQUEST_TEMPLATE, work
 
    - If no matching template is found → display available templates and ask the user to choose or skip
 4. **Detect differences** for the selected template:
-   - `ci-templates/<lang>/.github/workflows/ci.yml` vs local `.github/workflows/ci.yml`
+   - Each file under `ci-templates/<lang>/.github/workflows/` vs the same filename in local `.github/workflows/`
    - Each file directly under `ci-templates/<lang>/` (non-`.github/` items) vs the same filename at the local project root
    - Categorize each file as **Identical**, **Differs**, **New**, or **Local only** (same criteria as Step 2)
 5. **Present differences and confirm with the user**:
