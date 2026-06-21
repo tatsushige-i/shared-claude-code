@@ -76,12 +76,27 @@ Monitor CI checks and Copilot review together. Repeat the loop until **both** ar
    - Treat `pending` / `in_progress` as "still running" — keep waiting.
    - When no running checks remain, classify the result as **all passing** or **failure** (any check in a failing/error state).
 
-2. **Copilot / human review**: Fetch review threads via GraphQL (same query as `git-review-respond` Step 3) and detect unresolved threads with actionable comments:
+2. **Copilot / human review**: Fetch review state via GraphQL. The base is the same query as `git-review-respond` Step 3, extended with `reviewRequests` and `reviews` so the loop can confirm Copilot review **completion** before reading threads:
 
    ```graphql
    query {
      repository(owner: "{owner}", name: "{repo}") {
        pullRequest(number: <PR number>) {
+         reviewRequests(first: 20) {
+           nodes {
+             requestedReviewer {
+               ... on Bot { login }
+               ... on User { login }
+             }
+           }
+         }
+         reviews(first: 50) {
+           nodes {
+             state
+             author { login }
+             submittedAt
+           }
+         }
          reviewThreads(first: 100) {
            nodes {
              isResolved
@@ -97,7 +112,15 @@ Monitor CI checks and Copilot review together. Repeat the loop until **both** ar
    }
    ```
 
-   - "Unresolved finding" = a `reviewThread` with `isResolved == false`. This includes Copilot (`copilot-pull-request-reviewer`) and human review comments.
+   - **Gate on Copilot review completion first.** Before evaluating `reviewThreads`, classify the Copilot review state. An empty `reviewThreads` is **not** sufficient to conclude "no findings" — Copilot may simply not have posted yet:
+
+     | State | Detection | Action |
+     |---|---|---|
+     | Copilot review pending | `reviewRequests` contains `copilot-pull-request-reviewer`, **or** `reviews.nodes` has a Copilot entry whose `submittedAt` is null (PENDING draft) | Keep waiting (continue the loop) |
+     | Copilot review complete | `reviews.nodes` contains a Copilot entry with `submittedAt` set (non-null) | Proceed to evaluate `reviewThreads` normally |
+     | Copilot not configured | Neither `reviewRequests` nor `reviews` contains Copilot | Ask the user whether to proceed without Copilot review |
+
+   - **Only after the gate passes**, detect unresolved threads: "Unresolved finding" = a `reviewThread` with `isResolved == false`. This includes Copilot (`copilot-pull-request-reviewer`) and human review comments.
    - Completion judgment uses **the presence of unresolved threads** (not re-review requests).
 
 3. **Polling interval / timeout**:
@@ -105,9 +128,10 @@ Monitor CI checks and Copilot review together. Repeat the loop until **both** ar
    - Apply a maximum wait (e.g., **~15 minutes** total) per monitoring phase. On timeout, display the current CI and review state and stop — do not merge.
 
 4. Branch on the loop result:
+   - **Copilot review pending** (gate not yet passed) → keep waiting (continue the loop until completion or timeout).
    - **CI failure** → go to Step 4 (CI failure handling).
    - **Unresolved review threads present** → go to Step 4 (review finding handling).
-   - **CI all passing AND no unresolved threads** → go to Step 5.
+   - **CI all passing AND Copilot review settled (complete, or not configured and confirmed by the user) AND no unresolved threads** → go to Step 5.
 
 ### Step 4: Address Findings (Conditional)
 
