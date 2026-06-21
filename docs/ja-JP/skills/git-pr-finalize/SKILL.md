@@ -76,12 +76,27 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
    - `pending` / `in_progress` は「実行中」として扱い、待機を続ける。
    - 実行中のチェックが無くなったら、結果を **全パス** か **失敗**（いずれかが failing/error 状態）に分類する。
 
-2. **Copilot / 人間のレビュー**: GraphQL でレビュースレッドを取得し（`git-review-respond` Step 3 と同じクエリ）、対応すべきコメントを含む未解決スレッドを検出する:
+2. **Copilot / 人間のレビュー**: GraphQL でレビュー状態を取得する。ベースは `git-review-respond` Step 3 と同じクエリで、スレッドを読む前に Copilot レビューの**完了**を確認できるよう `reviewRequests` と `reviews` を追加する:
 
    ```graphql
    query {
      repository(owner: "{owner}", name: "{repo}") {
        pullRequest(number: <PR number>) {
+         reviewRequests(first: 10) {
+           nodes {
+             requestedReviewer {
+               ... on Bot { login }
+               ... on User { login }
+             }
+           }
+         }
+         reviews(first: 50) {
+           nodes {
+             state
+             author { login }
+             submittedAt
+           }
+         }
          reviewThreads(first: 100) {
            nodes {
              isResolved
@@ -97,7 +112,15 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
    }
    ```
 
-   - 「未解決の指摘」 = `isResolved == false` の `reviewThread`。これには Copilot（`copilot-pull-request-reviewer`）と人間のレビューコメントの両方を含む。
+   - **まず Copilot レビューの完了をゲートする。** `reviewThreads` を評価する前に Copilot レビューの状態を分類する。`reviewThreads` が空でも「指摘なし」と結論づけてはならない — Copilot がまだ投稿していないだけの可能性がある:
+
+     | 状態 | 検出条件 | アクション |
+     |---|---|---|
+     | Copilot レビュー進行中 | `reviewRequests` に `copilot-pull-request-reviewer` があるが `reviews.nodes` に Copilot のエントリがない | 待機を継続（ループ続行） |
+     | Copilot レビュー完了 | `reviews.nodes` に Copilot のエントリがあり `submittedAt` が設定されている | 通常どおり `reviewThreads` を評価する |
+     | Copilot 未設定 | `reviewRequests` にも `reviews` にも Copilot が存在しない | Copilot レビューなしで進めてよいかユーザーに確認する |
+
+   - **ゲートを通過してからのみ**、未解決スレッドを検出する: 「未解決の指摘」 = `isResolved == false` の `reviewThread`。これには Copilot（`copilot-pull-request-reviewer`）と人間のレビューコメントの両方を含む。
    - 完了判定は**未解決スレッドの有無**で行う（再レビュー依頼の有無では判定しない）。
 
 3. **ポーリング間隔 / タイムアウト**:
@@ -105,9 +128,10 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
    - 監視フェーズごとに最大待機時間（例: 合計 **約 15 分**）を設ける。タイムアウト時は現在の CI とレビュー状態を表示して停止する — マージはしない。
 
 4. ループ結果で分岐する:
+   - **Copilot レビュー進行中**（ゲート未通過） → 完了またはタイムアウトまで待機を継続する（ループ続行）。
    - **CI 失敗** → Step 4（CI 失敗対応）へ。
    - **未解決レビュースレッドあり** → Step 4（レビュー指摘対応）へ。
-   - **CI 全パス かつ 未解決スレッド無し** → Step 5 へ。
+   - **CI 全パス かつ Copilot レビューが確定（完了、または未設定でユーザー確認済み）かつ 未解決スレッド無し** → Step 5 へ。
 
 ### Step 4: 指摘対応（条件付き）
 
