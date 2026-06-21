@@ -82,7 +82,7 @@ Monitor CI checks and Copilot review together. Repeat the loop until **both** ar
    query {
      repository(owner: "{owner}", name: "{repo}") {
        pullRequest(number: <PR number>) {
-         reviewRequests(first: 10) {
+         reviewRequests(first: 20) {
            nodes {
              requestedReviewer {
                ... on Bot { login }
@@ -116,8 +116,8 @@ Monitor CI checks and Copilot review together. Repeat the loop until **both** ar
 
      | State | Detection | Action |
      |---|---|---|
-     | Copilot review pending | `reviewRequests` contains `copilot-pull-request-reviewer` but `reviews.nodes` has no Copilot entry | Keep waiting (continue the loop) |
-     | Copilot review complete | `reviews.nodes` contains a Copilot entry with `submittedAt` set | Proceed to evaluate `reviewThreads` normally |
+     | Copilot review pending | `reviewRequests` contains `copilot-pull-request-reviewer`, **or** `reviews.nodes` has a Copilot entry whose `submittedAt` is null (PENDING draft) | Keep waiting (continue the loop) |
+     | Copilot review complete | `reviews.nodes` contains a Copilot entry with `submittedAt` set (non-null) | Proceed to evaluate `reviewThreads` normally |
      | Copilot not configured | Neither `reviewRequests` nor `reviews` contains Copilot | Ask the user whether to proceed without Copilot review |
 
    - **Only after the gate passes**, detect unresolved threads: "Unresolved finding" = a `reviewThread` with `isResolved == false`. This includes Copilot (`copilot-pull-request-reviewer`) and human review comments.

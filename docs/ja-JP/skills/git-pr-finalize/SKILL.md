@@ -82,7 +82,7 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
    query {
      repository(owner: "{owner}", name: "{repo}") {
        pullRequest(number: <PR number>) {
-         reviewRequests(first: 10) {
+         reviewRequests(first: 20) {
            nodes {
              requestedReviewer {
                ... on Bot { login }
@@ -116,8 +116,8 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
 
      | 状態 | 検出条件 | アクション |
      |---|---|---|
-     | Copilot レビュー進行中 | `reviewRequests` に `copilot-pull-request-reviewer` があるが `reviews.nodes` に Copilot のエントリがない | 待機を継続（ループ続行） |
-     | Copilot レビュー完了 | `reviews.nodes` に Copilot のエントリがあり `submittedAt` が設定されている | 通常どおり `reviewThreads` を評価する |
+     | Copilot レビュー進行中 | `reviewRequests` に `copilot-pull-request-reviewer` がある、**または** `reviews.nodes` の Copilot エントリの `submittedAt` が null（PENDING ドラフト） | 待機を継続（ループ続行） |
+     | Copilot レビュー完了 | `reviews.nodes` に Copilot のエントリがあり `submittedAt` が設定されている（非 null） | 通常どおり `reviewThreads` を評価する |
      | Copilot 未設定 | `reviewRequests` にも `reviews` にも Copilot が存在しない | Copilot レビューなしで進めてよいかユーザーに確認する |
 
    - **ゲートを通過してからのみ**、未解決スレッドを検出する: 「未解決の指摘」 = `isResolved == false` の `reviewThread`。これには Copilot（`copilot-pull-request-reviewer`）と人間のレビューコメントの両方を含む。
