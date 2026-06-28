@@ -2,7 +2,7 @@
 
 # shared-claude-code
 
-A centralized source of shared Claude Code rules and skills for use across multiple repositories. Rules and skills are distributed via **symlinks**, while GitHub configuration and CI templates are distributed via **file copy**.
+A centralized source of shared Claude Code rules, skills, and agents for use across multiple repositories. Rules, skills, and agents are distributed via **symlinks**, while GitHub configuration and CI templates are distributed via **file copy**.
 
 ## Structure
 
@@ -23,6 +23,8 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── git-review-respond/ # Respond to PR review comments
 ├── tech-debt-audit-flutter/ # Audit technical debt in Flutter / Dart projects
 └── tech-debt-audit-nextjs/ # Audit technical debt in Next.js projects
+agents/                 # Master subagent definitions (single .md files) — symlinked into consuming repos
+└── README.md           # Agents index table
 hooks/                  # Shared hook definitions — merged into consuming repos' settings.json via config-claude-sync
 └── shared-hooks.json   # Shared hooks for PreToolUse / Stop / UserPromptSubmit / etc.
 ci-templates/           # CI/config templates by language — copied to consuming repos
@@ -33,20 +35,21 @@ ci-templates/           # CI/config templates by language — copied to consumin
 docs/ja-JP/             # Japanese translations (supplementary, not authoritative)
 .claude/
 ├── rules/              # Symlinks → ../../rules/
-└── skills/             # Symlinks → ../../skills/ + repo-local skills
+├── skills/             # Symlinks → ../../skills/ + repo-local skills
+└── agents/             # Symlinks → ../../agents/ + repo-local agents
 ```
 
 ## Getting Started
 
 **Prerequisite**: All consuming repositories must be in the same parent directory as this repository.
 
-### 1. Symlink rules and skills
+### 1. Symlink rules, skills, and agents
 
-From the consuming repository root, create symlinks to shared rules and skills:
+From the consuming repository root, create symlinks to shared rules, skills, and agents:
 
 ```bash
 # Create destination directories
-mkdir -p .claude/rules/shared .claude/skills
+mkdir -p .claude/rules/shared .claude/skills .claude/agents/shared
 
 # Rules
 ln -s ../../../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
@@ -64,6 +67,9 @@ ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-f
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
+
+# Agents (symlinked under .claude/agents/shared/; add a line per shared agent as they are introduced)
+# ln -s ../../../../shared-claude-code/agents/<name>.md .claude/agents/shared/<name>.md
 ```
 
 Or use the `/config-claude-sync` skill to detect missing symlinks and create them automatically.

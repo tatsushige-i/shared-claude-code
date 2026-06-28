@@ -2,7 +2,7 @@
 
 # shared-claude-code
 
-複数リポジトリで共有する Claude Code のルールとスキルの集約リポジトリ。ルールとスキルは**シンボリックリンク**で、GitHub設定とCIテンプレートは**ファイルコピー**で配布する。
+複数リポジトリで共有する Claude Code のルール・スキル・エージェントの集約リポジトリ。ルール・スキル・エージェントは**シンボリックリンク**で、GitHub設定とCIテンプレートは**ファイルコピー**で配布する。
 
 ## 構成
 
@@ -23,6 +23,8 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── git-review-respond/ # PRレビューコメントへの対応
 ├── tech-debt-audit-flutter/ # Flutter / Dartプロジェクトの技術的負債調査
 └── tech-debt-audit-nextjs/ # Next.jsプロジェクトの技術的負債調査
+agents/                 # マスター subagent 定義（単一 .md ファイル） — シンボリックリンクで消費リポジトリに配布
+└── README.md           # エージェント一覧テーブル
 hooks/                  # 共通hooks定義 — config-claude-sync で消費リポジトリの settings.json にマージ
 └── shared-hooks.json   # PreToolUse / Stop / UserPromptSubmit 等の共通hooks
 ci-templates/           # 言語別CI/設定テンプレート — ファイルコピーで消費リポジトリに配布
@@ -32,20 +34,21 @@ ci-templates/           # 言語別CI/設定テンプレート — ファイル�
 docs/ja-JP/             # 日本語翻訳（補足資料。英語版が正）
 .claude/
 ├── rules/              # シンボリックリンク → ../../rules/
-└── skills/             # シンボリックリンク → ../../skills/ + ローカルスキル
+├── skills/             # シンボリックリンク → ../../skills/ + ローカルスキル
+└── agents/             # シンボリックリンク → ../../agents/ + ローカルエージェント
 ```
 
 ## セットアップ手順
 
 **前提条件**: すべての消費リポジトリがこのリポジトリと同じ親ディレクトリに配置されていること。
 
-### 1. ルールとスキルのシンボリックリンク作成
+### 1. ルール・スキル・エージェントのシンボリックリンク作成
 
-消費リポジトリのルートから、共有ルールとスキルへのシンボリックリンクを作成する:
+消費リポジトリのルートから、共有ルール・スキル・エージェントへのシンボリックリンクを作成する:
 
 ```bash
 # 配置先ディレクトリを作成
-mkdir -p .claude/rules/shared .claude/skills
+mkdir -p .claude/rules/shared .claude/skills .claude/agents/shared
 
 # ルール
 ln -s ../../../../shared-claude-code/rules/conventions.md .claude/rules/shared/conventions.md
@@ -63,6 +66,9 @@ ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-f
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
+
+# エージェント（.claude/agents/shared/ 配下にシンボリックリンク。共有エージェント追加時に1行ずつ追記）
+# ln -s ../../../../shared-claude-code/agents/<name>.md .claude/agents/shared/<name>.md
 ```
 
 または `/config-claude-sync` スキルを使って、不足しているシンボリックリンクを自動検出・作成できる。

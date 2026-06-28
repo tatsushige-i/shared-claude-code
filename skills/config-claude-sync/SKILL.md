@@ -1,20 +1,21 @@
 ---
 name: config-claude-sync
-description: Sync shared rules and skills from shared-claude-code repository - detect missing symlinks and create them
+description: Sync shared rules, skills, and agents from shared-claude-code repository - detect missing symlinks and create them
 ---
 
 # Shared Config Sync Skill
 
-Sync shared rules and skills from the shared-claude-code repository to the current project. Detect missing symlinks and create them after user confirmation.
+Sync shared rules, skills, and agents from the shared-claude-code repository to the current project. Detect missing symlinks and create them after user confirmation.
 
 ## Steps
 
 ### Step 1: Locate the Shared Repository
 
-1. Search for symlinks under `.claude/rules/shared/` and `.claude/skills/`
+1. Search for symlinks under `.claude/rules/shared/`, `.claude/skills/`, and `.claude/agents/shared/`
 2. Resolve the shared-claude-code repository path from the `readlink` result of found symlinks
-   - Rule link example: `../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
-   - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
+   - Rule link example: `../../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
+   - Skill link example: `../../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
+   - Agent link example: `../../../../shared-claude-code/agents/code-reviewer.md` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
 
    ```text
@@ -24,21 +25,24 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 
 4. Verify that `rules/` and `skills/` directories exist at the resolved path
    - If they do not exist → display error and exit
+   - `agents/` may not exist in older shared-claude-code checkouts; if absent, skip agents handling throughout this skill (treat as "no agents to sync")
 
 ### Step 2: Detect Differences
 
 1. Get the list of `.md` files under `rules/` in shared-claude-code
 2. Get the list of directories containing `SKILL.md` under `skills/` in shared-claude-code
-3. Compare with the current project and detect missing items:
+3. Get the list of `.md` files under `agents/` in shared-claude-code (exclude `README.md`)
+4. Compare with the current project and detect missing items:
    - **Rules**: no symlink exists at `.claude/rules/shared/<name>.md`
    - **Skills**: no symlink exists at `.claude/skills/<name>`
+   - **Agents**: no symlink exists at `.claude/agents/shared/<name>.md`
 
 ### Step 3: Present Differences and Confirm with User
 
 1. If everything is already synced → display the following and exit:
 
    ```text
-   All rules and skills are already synced.
+   All rules, skills, and agents are already synced.
    ```
 
 2. If there are missing items, display in the following format:
@@ -54,8 +58,13 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
    - git-branch-cleanup
    - git-issue-create
 
+   ### Agents
+   - code-reviewer
+
    Would you like to sync these items? Let me know if you want to exclude any.
    ```
+
+   - Omit any section (Rules / Skills / Agents) that has no missing items
 
 3. Branch based on the user's response:
    - Full approval → sync all items
@@ -82,15 +91,20 @@ Sync shared rules and skills from the shared-claude-code repository to the curre
 1. Rule sync:
    - Create `.claude/rules/shared/` directory with `mkdir -p` if it does not exist
    - Get the prefix from the `readlink` result of existing rule symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../../shared-claude-code/rules/conventions.md`, create new ones as `../../../shared-claude-code/rules/<name>.md`
+   - Example: if an existing link is `../../../../shared-claude-code/rules/conventions.md`, create new ones as `../../../../shared-claude-code/rules/<name>.md`
 2. Skill sync:
    - Get the prefix from the `readlink` result of existing skill symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../shared-claude-code/skills/git-pr-create`, create new ones as `../../shared-claude-code/skills/<name>`
-3. After creating each symlink, verify that the link target resolves correctly
+   - Example: if an existing link is `../../../shared-claude-code/skills/git-pr-create`, create new ones as `../../../shared-claude-code/skills/<name>`
+3. Agent sync:
+   - Create `.claude/agents/shared/` directory with `mkdir -p` if it does not exist
+   - Get the prefix from the `readlink` result of an existing agent symlink and create new symlinks using the same pattern
+   - Example: if an existing link is `../../../../shared-claude-code/agents/code-reviewer.md`, create new ones as `../../../../shared-claude-code/agents/<name>.md`
+   - **First-time bootstrap** (no existing agent symlink to derive the prefix from): reuse the relative-path depth of the existing rule symlinks under `.claude/rules/shared/` and substitute `agents` for `rules` — both live one level under `.claude/<category>/shared/`, so the prefix is identical (e.g. rules use `../../../../shared-claude-code/rules/<name>.md` → agents use `../../../../shared-claude-code/agents/<name>.md`)
+4. After creating each symlink, verify that the link target resolves correctly
 
 ### Step 6: Update Documentation
 
-If new skills were synced in Step 5, update documentation files that list skills. Skip this step if only rules were synced.
+If new skills or agents were synced in Step 5, update documentation files that list them. Skip this step if only rules were synced.
 
 1. Check if `.claude/skills/README.md` exists in the current project
    - If it exists:
@@ -109,6 +123,12 @@ If new skills were synced in Step 5, update documentation files that list skills
      - For each synced skill not yet listed, append an entry matching the existing format
      - Stage the file with `git add CLAUDE.md`
    - If `CLAUDE.md` does not exist or does not contain a skills listing: skip
+4. If new agents were synced, update the agents index where present (skip otherwise):
+   - For `.claude/agents/README.md` and `docs/ja-JP/agents/README.md`, if the file exists:
+     - For each synced agent not yet listed, read the `description` from the `agents/<name>.md` frontmatter in shared-claude-code
+     - Append a table row at the end of the existing table: `| \`<name>\` | <description> |`
+     - Stage the file with `git add <path>`
+   - If neither file exists: skip
 
 ### Step 6b: Sync Shared Hooks
 
@@ -157,9 +177,10 @@ If new skills were synced in Step 5, update documentation files that list skills
 1. Stage the symlinks created in Step 5 individually (do not use `git add -A` or `git add .`):
    - Rules: `git add .claude/rules/shared/<name>.md`
    - Skills: `git add .claude/skills/<name>`
+   - Agents: `git add .claude/agents/shared/<name>.md`
    - README files staged in Step 6 are already included
    - `settings.json` staged in Step 6b is already included
-2. Commit with `git commit -m "chore: sync shared claude rules and skills"`
+2. Commit with `git commit -m "chore: sync shared claude rules, skills, and agents"`
 3. If the commit fails (e.g., no staged files), display a warning and proceed to Step 8
 
 ### Step 8: Display Results
@@ -177,6 +198,9 @@ Display sync results in the following format:
 - Synced skills: X
   - <skill name 1>
   - <skill name 2>
+- Synced agents: X
+  - <agent name 1>
+  - <agent name 2>
 - Synced hooks: X
   - <hook id 1> (new)
   - <hook id 2> (updated)
@@ -187,5 +211,6 @@ You can create a PR with `/git-pr-create`.
 
 - Display "You can create a PR with `/git-pr-create`." only when a new branch was created in Step 4
 - If running on a branch other than main, display "existing" and omit the PR suggestion
+- Display "Synced agents" only when agents were synced in Step 5
 - Display "Updated README" only when README files were updated in Step 6
 - Display "Synced hooks" only when hooks were added or updated in Step 6b; append `(new)` or `(updated)` per entry
