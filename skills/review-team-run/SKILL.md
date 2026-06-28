@@ -27,18 +27,17 @@ Performance and accessibility are intentionally out of scope for this generic te
 
 1. Resolve `<base>` exactly as `git-pr-create` Step 0 does (first matching rule wins):
    - Current branch starts with `hotfix/` → `<base>` = `main`
-   - Else, if a `release/*` branch on `origin` is an ancestor of `HEAD` → `<base>` = the closest such release branch (run `git fetch origin` first so their tips are local; test each with `git merge-base --is-ancestor origin/<R> HEAD`)
+   - Else, list `release/*` branches with `git ls-remote --heads origin 'release/*'`; if any is an ancestor of `HEAD` → `<base>` = the closest one (run `git fetch origin` first so their tips are local, test each with `git merge-base --is-ancestor origin/<R> HEAD`, and among the ancestors pick the one whose merge-base with `HEAD` is the most recent)
    - Else, if `git ls-remote --heads origin develop` is non-empty → `<base>` = `develop`
    - Else → `<base>` = `main`
 
-2. Collect the **pre-PR delta** as the union of three sources (the changes that would become the PR, whether committed yet or not):
-   - **Uncommitted tracked changes**: `git diff HEAD`
-   - **Untracked files**: list with `git ls-files --others --exclude-standard`, then include each file's content (skip binary files and anything matched by `.gitignore`)
-   - **Committed branch changes**: `git diff <base>...HEAD` (empty when there are no commits beyond `<base>`)
+2. Collect the **pre-PR delta** — the changes that would become the PR, whether committed yet or not:
+   - **Tracked changes (committed + uncommitted)**: `git diff <base>` — comparing the working tree against `<base>` captures both the branch's commits and the uncommitted working-tree edits in a single diff with no overlap.
+   - **Untracked files**: list with `git ls-files --others --exclude-standard`, then include each file's content (skip binary files and anything matched by `.gitignore`).
 
-3. Build the file list and line counts for display with `git diff <base> --stat` combined with `git status --short` (so both committed and uncommitted changes are reflected). Exclude obvious auto-generated files from the headline counts.
+3. Build the file list and line counts for display with `git diff <base> --stat`, plus the untracked files from the previous step. Exclude obvious auto-generated files from the headline counts.
 
-4. If all three sources are empty → display `レビュー対象の差分がありません。` and exit.
+4. If both the tracked diff and the untracked list are empty → display `No changes to review.` and exit.
 
 ### Step 2: Present the Target and the Team
 
@@ -48,14 +47,14 @@ Show what will be reviewed and by whom, then proceed (no confirmation needed —
 ## Review Team Run
 
 Target: <branch> vs <base> — <N> files, +<X> / -<Y> lines
-（未コミット差分を含む）
+(includes uncommitted changes)
 
 Members (parallel):
-- review-correctness (opus) — 正確性・バグ
-- review-security (opus) — セキュリティ
-- review-design (opus) — 設計・シンプルさ
-- review-readability (sonnet) — 可読性・クリーンさ
-- review-tests (sonnet) — テスト
+- review-correctness (opus) — correctness & bugs
+- review-security (opus) — security
+- review-design (opus) — design & simplicity
+- review-readability (sonnet) — readability & cleanliness
+- review-tests (sonnet) — testing
 ```
 
 ### Step 3: Launch the Five Reviewers in Parallel
@@ -123,5 +122,5 @@ Target: <branch> vs <base>, <N> files, +<X> / -<Y> lines
 ```
 
 - Omit any severity section that has zero findings.
-- If every member returned `No findings.`, display `指摘はありませんでした。` and the empty summary table.
+- If every member returned `No findings.`, display `No findings.` and the empty summary table.
 - This skill **presents only** — it does not edit code, commit, or create Issues. Suggest the user address findings and then run `/git-pr-create` when ready.

@@ -27,18 +27,17 @@ PR作成前の差分を、スタンスの異なる5人のレビュー subagent �
 
 1. `git-pr-create` Step 0 と同じく `<base>` を解決する（最初に一致したルールを採用）:
    - 現在ブランチが `hotfix/` で始まる → `<base>` = `main`
-   - そうでなく、`origin` の `release/*` ブランチが `HEAD` の祖先 → `<base>` = 最も近いその release ブランチ（先に `git fetch origin` で tip をローカルに用意し、各 `R` を `git merge-base --is-ancestor origin/<R> HEAD` で判定）
+   - そうでなく、`git ls-remote --heads origin 'release/*'` で `release/*` ブランチを列挙し、いずれかが `HEAD` の祖先なら → `<base>` = 最も近いもの（先に `git fetch origin` で tip をローカルに用意し、各 `R` を `git merge-base --is-ancestor origin/<R> HEAD` で判定、祖先のうち `HEAD` との merge-base が最新のものを選ぶ）
    - そうでなく、`git ls-remote --heads origin develop` が非空 → `<base>` = `develop`
    - それ以外 → `<base>` = `main`
 
-2. **PR作成前デルタ**を以下3ソースの和集合として収集する（コミット済みか否かによらず、PRに載る変更）:
-   - **未コミットの tracked 変更**: `git diff HEAD`
-   - **未追跡ファイル**: `git ls-files --others --exclude-standard` で列挙し、各ファイルの内容を含める（バイナリと `.gitignore` 該当はスキップ）
-   - **コミット済みブランチ変更**: `git diff <base>...HEAD`（`<base>` 以降のコミットが無ければ空）
+2. **PR作成前デルタ**を収集する（コミット済みか否かによらず、PRに載る変更）:
+   - **tracked 変更（コミット済み＋未コミット）**: `git diff <base>` — 作業ツリーを `<base>` と比較することで、ブランチのコミットと未コミットの作業ツリー編集を重複なく1つの差分で取得できる。
+   - **未追跡ファイル**: `git ls-files --others --exclude-standard` で列挙し、各ファイルの内容を含める（バイナリと `.gitignore` 該当はスキップ）。
 
-3. 表示用のファイル一覧と増減行は `git diff <base> --stat` と `git status --short` を併用して構築する（コミット済み・未コミット双方を反映）。明らかな自動生成ファイルは見出しの件数から除外する。
+3. 表示用のファイル一覧と増減行は `git diff <base> --stat` に前ステップの未追跡ファイルを加えて構築する。明らかな自動生成ファイルは見出しの件数から除外する。
 
-4. 3ソースすべてが空なら → `レビュー対象の差分がありません。` を表示して終了。
+4. tracked 差分・未追跡リストの両方が空なら → `レビュー対象の差分がありません。` を表示して終了。
 
 ### Step 2: 対象とチームの提示
 
