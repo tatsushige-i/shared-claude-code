@@ -6,4 +6,8 @@
 
 | Agent | 説明 |
 |---|---|
-| _(まだなし)_ | 共有エージェントを追加するとここに一覧表示される。 |
+| `review-correctness` | 正確性・バグに特化したコードレビュアー（opus）。`review-team-run` の並列チームの一員。 |
+| `review-security` | セキュリティに特化したコードレビュアー（opus）。`review-team-run` の並列チームの一員。 |
+| `review-design` | 設計・シンプルさに特化したコードレビュアー（opus）。`review-team-run` の並列チームの一員。 |
+| `review-readability` | 可読性・クリーンさに特化したコードレビュアー（sonnet）。`review-team-run` の並列チームの一員。 |
+| `review-tests` | テストに特化したコードレビュアー（sonnet）。`review-team-run` の並列チームの一員。 |
