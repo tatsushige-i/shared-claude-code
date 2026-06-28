@@ -13,9 +13,9 @@ Sync shared rules, skills, and agents from the shared-claude-code repository to 
 
 1. Search for symlinks under `.claude/rules/shared/`, `.claude/skills/`, and `.claude/agents/shared/`
 2. Resolve the shared-claude-code repository path from the `readlink` result of found symlinks
-   - Rule link example: `../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
-   - Skill link example: `../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
-   - Agent link example: `../../../shared-claude-code/agents/code-reviewer.md` → extract `shared-claude-code` path
+   - Rule link example: `../../../../shared-claude-code/rules/conventions.md` → extract `shared-claude-code` path
+   - Skill link example: `../../../shared-claude-code/skills/git-pr-create` → extract `shared-claude-code` path
+   - Agent link example: `../../../../shared-claude-code/agents/code-reviewer.md` → extract `shared-claude-code` path
 3. If no symlinks are found → display error and exit:
 
    ```text
@@ -91,10 +91,10 @@ Sync shared rules, skills, and agents from the shared-claude-code repository to 
 1. Rule sync:
    - Create `.claude/rules/shared/` directory with `mkdir -p` if it does not exist
    - Get the prefix from the `readlink` result of existing rule symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../../shared-claude-code/rules/conventions.md`, create new ones as `../../../shared-claude-code/rules/<name>.md`
+   - Example: if an existing link is `../../../../shared-claude-code/rules/conventions.md`, create new ones as `../../../../shared-claude-code/rules/<name>.md`
 2. Skill sync:
    - Get the prefix from the `readlink` result of existing skill symlinks and create new symlinks using the same pattern
-   - Example: if an existing link is `../../shared-claude-code/skills/git-pr-create`, create new ones as `../../shared-claude-code/skills/<name>`
+   - Example: if an existing link is `../../../shared-claude-code/skills/git-pr-create`, create new ones as `../../../shared-claude-code/skills/<name>`
 3. Agent sync:
    - Create `.claude/agents/shared/` directory with `mkdir -p` if it does not exist
    - Get the prefix from the `readlink` result of an existing agent symlink and create new symlinks using the same pattern

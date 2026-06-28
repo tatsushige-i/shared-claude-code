@@ -45,7 +45,7 @@ docs/ja-JP/             # Japanese translations (supplementary, not authoritativ
 
 ### 1. Symlink rules, skills, and agents
 
-From the consuming repository root, create symlinks to shared rules and skills:
+From the consuming repository root, create symlinks to shared rules, skills, and agents:
 
 ```bash
 # Create destination directories
