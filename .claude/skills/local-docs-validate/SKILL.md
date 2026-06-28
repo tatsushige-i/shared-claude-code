@@ -29,6 +29,19 @@ Validate documentation consistency across the shared-claude-code repository. Sca
    - **2-1 Japanese translation**: `docs/ja-JP/rules/<filename>` exists
 3. Record each issue found
 
+### Step 2b: Scan Agents
+
+1. List all `.md` files under `agents/` (excluding `README.md`). If the `agents/` directory does not exist, skip this step.
+2. For each agent file, verify:
+   - **2b-1 Frontmatter**: `agents/<name>.md` contains `name` and `description` in YAML frontmatter
+   - **2b-2 Symlink exists**: `.claude/agents/<name>.md` exists as a symlink pointing to `../../agents/<name>.md`
+     - Check with `readlink .claude/agents/<name>.md`
+     - If the symlink does not exist or points to a different target → flag as issue
+   - **2b-3 README table entry**: `agents/README.md` contains a row with the agent name in the agents table
+     - Check with `grep` for the agent name in `agents/README.md`
+   - **2b-4 Japanese translation**: `docs/ja-JP/agents/<name>.md` exists
+3. Record each issue found
+
 ### Step 3: Validate Structure Sections
 
 1. **README.md skills list**:
@@ -50,6 +63,7 @@ Verify that the following core translation files exist:
 | 4-1 | `docs/ja-JP/README.md` | File exists |
 | 4-2 | `docs/ja-JP/CLAUDE.md` | File exists |
 | 4-3 | `docs/ja-JP/skills/README.md` | File exists |
+| 4-4 | `docs/ja-JP/agents/README.md` | File exists |
 
 ### Step 5: Present Findings
 
@@ -71,6 +85,9 @@ Verify that the following core translation files exist:
    ### Rules Integrity
    - All passed
 
+   ### Agents Integrity
+   - All passed
+
    ### Structure Sections
    - README.md — `config-github-sync` not listed in Structure section
 
@@ -88,8 +105,10 @@ Based on the user's response, apply fixes:
 
 **Auto-fixable** (apply with user approval):
 
-- **Missing symlink**: Create with `ln -s ../../skills/<name> .claude/skills/<name>`, then verify with `readlink`
+- **Missing skill symlink**: Create with `ln -s ../../skills/<name> .claude/skills/<name>`, then verify with `readlink`
+- **Missing agent symlink**: Create with `ln -s ../../agents/<name>.md .claude/agents/<name>.md` (create `.claude/agents/` with `mkdir -p` first if absent), then verify with `readlink`
 - **Missing skills/README.md entry**: Read `name` and `description` from `skills/<name>/SKILL.md` frontmatter, generate a table row in the format `| \`<name>\` | \`/<name>\` | <description> |`, and append it to the table in`skills/README.md`
+- **Missing agents/README.md entry**: Read `name` and `description` from `agents/<name>.md` frontmatter, generate a table row in the format `| \`<name>\` | <description> |`, and append it to the table in `agents/README.md`
 
 **Manual fix required** (display warning only):
 

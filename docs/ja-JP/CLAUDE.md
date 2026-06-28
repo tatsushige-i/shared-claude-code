@@ -8,22 +8,23 @@
 
 **配布方式:**
 
-- **ルールとスキル** — シンボリックリンクで消費リポジトリの `.claude/rules/` と `.claude/skills/` に配布
+- **ルール・スキル・エージェント** — シンボリックリンクで消費リポジトリの `.claude/rules/`・`.claude/skills/`・`.claude/agents/` に配布
 - **GitHub設定とCIテンプレート** — `/config-github-sync` スキルによるファイルコピーで配布
 
 ## アーキテクチャ
 
 - **rules/** — マスタールールファイル（英語）、消費リポジトリにシンボリックリンク
 - **skills/** — マスタースキル定義、消費リポジトリにシンボリックリンク
+- **agents/** — マスター subagent 定義（単一 `.md` ファイル）、消費リポジトリにシンボリックリンク
 - **hooks/** — 共通hooks定義（`shared-hooks.json`）、`config-claude-sync` でマージ
-- **.claude/** — `rules/` と `skills/` へのシンボリックリンク、およびこのリポジトリ用 `settings.json`
+- **.claude/** — `rules/`・`skills/`・`agents/` へのシンボリックリンク、およびこのリポジトリ用 `settings.json`
 - **ci-templates/** — 言語別CIテンプレート、`/config-github-sync` でコピー
 - **.github/** — Issue/PRテンプレート、`/config-github-sync` でコピー
 - **docs/ja-JP/** — 日本語翻訳（補足資料。英語版が正）
 
 ## ドキュメントの記述言語（このリポジトリ）
 
-このリポジトリのマスター `.md` ファイル（rules、skills、README、CLAUDE.md）はすべて **英語** で記述する。日本語版は補足資料として `docs/ja-JP/` に配置し、`docs/ja-JP/` は英語マスタの翻訳専用とする。
+このリポジトリのマスター `.md` ファイル（rules、skills、agents、README、CLAUDE.md）はすべて **英語** で記述する。日本語版は補足資料として `docs/ja-JP/` に配置し、`docs/ja-JP/` は英語マスタの翻訳専用とする。
 
 ## 新しいスキルの追加手順
 
@@ -50,6 +51,28 @@
 1. `rules/<name>.md` を作成
 2. シンボリックリンクを追加: `.claude/rules/<name>.md -> ../../rules/<name>.md`
 3. `docs/ja-JP/rules/<name>.md` に日本語翻訳を追加
+
+## 新しいAgentの追加手順
+
+subagent は、YAML フロントマター（`name`, `description`、任意で `tools`, `model`）とシステムプロンプト本文からなる単一の Markdown ファイル。起動時の識別子はファイル名ではなく `name` フィールドで決まり、スコープ内で一意である必要がある。`model` フィールドでモデルを固定できる（`opus`, `sonnet`, `haiku`, `fable`, `inherit`）。
+
+エージェント追加時、**共有エージェント**か**ローカルエージェント**かをユーザーに確認すること。
+
+### 共有エージェント（シンボリックリンク経由で消費リポジトリに配布）
+
+1. `agents/<name>.md` を YAML フロントマター（`name`, `description`）付きで作成
+2. シンボリックリンクを追加: `.claude/agents/<name>.md -> ../../agents/<name>.md`
+3. `agents/README.md` のエージェント一覧テーブルに行を追加
+4. `docs/ja-JP/agents/<name>.md` に日本語翻訳を追加
+
+消費リポジトリでは、共有エージェントは `.claude/agents/shared/` 配下に同期される（Claude Code は `.claude/agents/` を再帰的に走査するため、サブディレクトリは起動に影響しない）。
+
+### ローカルエージェント（このリポジトリ専用）
+
+エージェント名の先頭に `local-` を付与する（例: `local-doc-reviewer`）。
+
+1. `.claude/agents/local-<name>.md` を YAML フロントマター（`name`, `description`）付きで直接作成（シンボリックリンク不要）
+2. `docs/ja-JP/local-agents/local-<name>.md` に日本語翻訳を追加
 
 ## 新しいHookの追加手順
 
