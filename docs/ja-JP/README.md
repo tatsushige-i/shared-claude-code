@@ -21,10 +21,12 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── git-pr-create/      # 分析付きGitHub PR作成
 ├── git-pr-finalize/    # CI/レビュー監視・指摘対応・マージ・整理
 ├── git-review-respond/ # PRレビューコメントへの対応
+├── review-team-run/    # PR作成前の差分にレビューチームを並列起動
 ├── tech-debt-audit-flutter/ # Flutter / Dartプロジェクトの技術的負債調査
 └── tech-debt-audit-nextjs/ # Next.jsプロジェクトの技術的負債調査
 agents/                 # マスター subagent 定義（単一 .md ファイル） — シンボリックリンクで消費リポジトリに配布
-└── README.md           # エージェント一覧テーブル
+├── README.md           # エージェント一覧テーブル
+└── review-*.md         # 並列コードレビューチーム（正確性 / セキュリティ / 設計 / 可読性 / テスト）
 hooks/                  # 共通hooks定義 — config-claude-sync で消費リポジトリの settings.json にマージ
 └── shared-hooks.json   # PreToolUse / Stop / UserPromptSubmit 等の共通hooks
 ci-templates/           # 言語別CI/設定テンプレート — ファイルコピーで消費リポジトリに配布
@@ -64,11 +66,16 @@ ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issu
 ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-finalize
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../../shared-claude-code/skills/review-team-run .claude/skills/review-team-run
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 
-# エージェント（.claude/agents/shared/ 配下にシンボリックリンク。共有エージェント追加時に1行ずつ追記）
-# ln -s ../../../../shared-claude-code/agents/<name>.md .claude/agents/shared/<name>.md
+# エージェント（.claude/agents/shared/ 配下にシンボリックリンク）
+ln -s ../../../../shared-claude-code/agents/review-correctness.md .claude/agents/shared/review-correctness.md
+ln -s ../../../../shared-claude-code/agents/review-security.md .claude/agents/shared/review-security.md
+ln -s ../../../../shared-claude-code/agents/review-design.md .claude/agents/shared/review-design.md
+ln -s ../../../../shared-claude-code/agents/review-readability.md .claude/agents/shared/review-readability.md
+ln -s ../../../../shared-claude-code/agents/review-tests.md .claude/agents/shared/review-tests.md
 ```
 
 または `/config-claude-sync` スキルを使って、不足しているシンボリックリンクを自動検出・作成できる。
@@ -93,5 +100,6 @@ ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/t
 | `git-pr-create` | `/git-pr-create` | Issue特定・規模チェック・差分分析・PR作成 |
 | `git-pr-finalize` | `/git-pr-finalize [PR#]` | CI/Copilotレビュー監視・指摘対応・確認後マージ・ブランチ整理 |
 | `git-review-respond` | `/git-review-respond <PR#>` | レビューコメント分析・コード修正・返信 |
+| `review-team-run` | `/review-team-run` | スタンスの異なるレビュー subagent を PR作成前の差分に並列起動し、統合レポートを提示 |
 | `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Flutter / Dartプロジェクトの技術的負債調査・優先度付きレポート生成 |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Next.js（App Router）プロジェクトの技術的負債調査・優先度付きレポート生成 |

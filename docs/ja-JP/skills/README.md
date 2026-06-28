@@ -11,4 +11,5 @@
 | `git-issue-start` | `/git-issue-start <Issue#>` | Issue取得・ラベル検証・ブランチ作成・Plan Mode移行 |
 | `git-pr-create` | `/git-pr-create` | Issue特定・規模チェック・差分分析・PR作成 |
 | `git-review-respond` | `/git-review-respond <PR#>` | レビューコメント分析・コード修正・返信 |
+| `review-team-run` | `/review-team-run` | スタンスの異なるレビュー subagent を PR作成前の差分に並列起動し、統合レポートを提示 |
 | `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Flutter / Dart プロジェクトの技術的負債を調査し、優先度付きレポートを生成する |

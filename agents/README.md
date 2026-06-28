@@ -6,4 +6,8 @@ In consuming repositories, shared agents are symlinked under `.claude/agents/sha
 
 | Agent | Description |
 |---|---|
-| _(none yet)_ | Shared agents will be listed here as they are added. |
+| `review-correctness` | Code reviewer focused on correctness and bugs (opus). Part of the `review-team-run` parallel team. |
+| `review-security` | Code reviewer focused on security (opus). Part of the `review-team-run` parallel team. |
+| `review-design` | Code reviewer focused on design and simplicity (opus). Part of the `review-team-run` parallel team. |
+| `review-readability` | Code reviewer focused on readability and cleanliness (sonnet). Part of the `review-team-run` parallel team. |
+| `review-tests` | Code reviewer focused on testing (sonnet). Part of the `review-team-run` parallel team. |
