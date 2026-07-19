@@ -11,3 +11,6 @@ In consuming repositories, shared agents are symlinked under `.claude/agents/sha
 | `review-design` | Code reviewer focused on design and simplicity (opus). Part of the `review-team-run` parallel team. |
 | `review-readability` | Code reviewer focused on readability and cleanliness (sonnet). Part of the `review-team-run` parallel team. |
 | `review-tests` | Code reviewer focused on testing (sonnet). Part of the `review-team-run` parallel team. |
+| `impl-planner` | Read-only implementation planner (opus) — lays out affected files, steps, and decision points from an Issue. Used by the `impl-pipeline` skill. |
+| `impl-coder` | Autonomous implementer (sonnet) — executes a confirmed plan for mechanical Issues. Used by the `impl-pipeline` skill. |
+| `impl-tester` | Test author (sonnet) — writes and runs tests from the spec, not the implementation. Used by the `impl-pipeline` skill. |

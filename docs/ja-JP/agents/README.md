@@ -11,3 +11,6 @@
 | `review-design` | 設計・シンプルさに特化したコードレビュアー（opus）。`review-team-run` の並列チームの一員。 |
 | `review-readability` | 可読性・クリーンさに特化したコードレビュアー（sonnet）。`review-team-run` の並列チームの一員。 |
 | `review-tests` | テストに特化したコードレビュアー（sonnet）。`review-team-run` の並列チームの一員。 |
+| `impl-planner` | 読み取り専用の実装プランナー（opus）。Issue から影響ファイル・手順・判断ポイントを洗い出す。`impl-pipeline` スキルから使う。 |
+| `impl-coder` | 自律実装担当（sonnet）。機械的な Issue で確定プランを実行する。`impl-pipeline` スキルから使う。 |
+| `impl-tester` | テスト担当（sonnet）。実装ではなく仕様からテストを書いて実行する。`impl-pipeline` スキルから使う。 |

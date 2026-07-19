@@ -21,11 +21,13 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── git-pr-create/      # Create GitHub PR with analysis
 ├── git-pr-finalize/    # Watch CI/review, address findings, merge, clean up
 ├── git-review-respond/ # Respond to PR review comments
+├── impl-pipeline/      # Drive Issue implementation with support agents (plan/code/test)
 ├── review-team-run/    # Run a parallel review team over the pre-PR diff
 ├── tech-debt-audit-flutter/ # Audit technical debt in Flutter / Dart projects
 └── tech-debt-audit-nextjs/ # Audit technical debt in Next.js projects
 agents/                 # Master subagent definitions (single .md files) — symlinked into consuming repos
 ├── README.md           # Agents index table
+├── impl-*.md           # Issue implementation pipeline agents (planner / coder / tester)
 └── review-*.md         # Parallel code-review team (correctness / security / design / readability / tests)
 hooks/                  # Shared hook definitions — merged into consuming repos' settings.json via config-claude-sync
 └── shared-hooks.json   # Shared hooks for PreToolUse / Stop / UserPromptSubmit / etc.
@@ -67,11 +69,15 @@ ln -s ../../../shared-claude-code/skills/git-issue-start .claude/skills/git-issu
 ln -s ../../../shared-claude-code/skills/git-pr-create .claude/skills/git-pr-create
 ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-finalize
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
+ln -s ../../../shared-claude-code/skills/impl-pipeline .claude/skills/impl-pipeline
 ln -s ../../../shared-claude-code/skills/review-team-run .claude/skills/review-team-run
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 
 # Agents (symlinked under .claude/agents/shared/)
+ln -s ../../../../shared-claude-code/agents/impl-planner.md .claude/agents/shared/impl-planner.md
+ln -s ../../../../shared-claude-code/agents/impl-coder.md .claude/agents/shared/impl-coder.md
+ln -s ../../../../shared-claude-code/agents/impl-tester.md .claude/agents/shared/impl-tester.md
 ln -s ../../../../shared-claude-code/agents/review-correctness.md .claude/agents/shared/review-correctness.md
 ln -s ../../../../shared-claude-code/agents/review-security.md .claude/agents/shared/review-security.md
 ln -s ../../../../shared-claude-code/agents/review-design.md .claude/agents/shared/review-design.md
@@ -101,6 +107,7 @@ The shared workflows include `close-linked-issues-on-develop.yml`, which automat
 | `git-pr-create` | `/git-pr-create` | Identify Issue, check size limits, analyze diff, create PR |
 | `git-pr-finalize` | `/git-pr-finalize [PR#]` | Watch CI/Copilot review, address findings, merge after confirmation, clean up branches |
 | `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
+| `impl-pipeline` | `/impl-pipeline <Issue#>` | Drive Issue implementation with support agents (plan/code/test), split mechanical vs. interactive at a human gate, reuse review-team-run, and hand off to git-pr-create |
 | `review-team-run` | `/review-team-run` | Run a parallel team of stance-distinct review subagents over the pre-PR diff and present a consolidated report |
 | `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Audit technical debt in Flutter / Dart projects with prioritized report |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Audit technical debt in Next.js (App Router) projects with prioritized report |
