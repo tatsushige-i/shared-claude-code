@@ -1,6 +1,7 @@
 ---
 name: git-pr-create
 description: Create a GitHub PR from the current branch - analyze changes, check size limits, and generate PR with proper formatting
+argument-hint: "[--copilot-review] [--finalize]"
 ---
 
 # Create PR Skill
@@ -9,10 +10,14 @@ description: Create a GitHub PR from the current branch - analyze changes, check
 
 ## 処理手順
 
-### Step 0: base ブランチの解決
+### Step 0: フラグ解析とbaseブランチの解決
 
 以降の処理が `main` のみのリポジトリ（後方互換）でも、`main` + `develop`（git-flow ライト）のリポジトリでも、`release/*` ブランチを持つリポジトリ（標準 Git Flow）でも動作するよう、最初に base ブランチを解決する。以降の `<base>` には解決した値を使用する。
 
+0. `$ARGUMENTS` から任意フラグを解析する(併用可・順不同):
+   - `--copilot-review`: PR作成時にCopilotをレビュアーとして指定する(Step 6で使用)
+   - `--finalize`: PR作成後、続けて `git-pr-finalize` のフローに接続する(Step 7で使用)
+   - どちらのフラグも指定されない場合、挙動は従来通り変わらない(後方互換)
 1. `git branch --show-current` で現在のブランチを取得する
 2. `<base>` を決定する（最初に一致したルールを採用）:
    - 現在のブランチが `hotfix/` で始まる → `<base>` = `main`
@@ -115,6 +120,7 @@ description: Create a GitHub PR from the current branch - analyze changes, check
    ```
 
 3. `gh pr create --base <base> --title "..." --body "..."` でPRを作成する
+   - `--copilot-review` が指定されている場合、`--reviewer @copilot` を追加する(`gh` v2.88.0+ のネイティブ Copilot reviewer 指定を利用)
    - bodyはheredocを使用してフォーマットを保持する:
 
      ```bash
@@ -140,3 +146,5 @@ PR #XX: <タイトル>
 - 変更ファイル数: X件
 - 変更行数: +XX / -XX
 ```
+
+`--finalize` が指定されている場合、作成したPR番号で `git-pr-finalize` のフローへ続けて接続する(`/git-pr-finalize <PR番号>` を実行するのと同等)。`git-pr-finalize` Step 6 のマージ前ユーザー確認ゲートは変更しない — このフラグはフローを連結するだけで、確認をスキップしない。

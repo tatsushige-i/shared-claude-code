@@ -1,6 +1,7 @@
 ---
 name: git-pr-create
 description: Create a GitHub PR from the current branch - analyze changes, check size limits, and generate PR with proper formatting
+argument-hint: "[--copilot-review] [--finalize]"
 ---
 
 # Create PR Skill
@@ -9,10 +10,14 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 ## Steps
 
-### Step 0: Resolve Base Branch
+### Step 0: Parse Flags and Resolve Base Branch
 
 Resolve the base branch first so the rest of the flow works for `main`-only repositories (backward compatible), `main` + `develop` (git-flow lite) repositories, and repositories with `release/*` branches (standard Git Flow). Use the resolved value wherever `<base>` appears below.
 
+0. Parse `$ARGUMENTS` for optional flags (can be combined, order-independent):
+   - `--copilot-review`: request Copilot as a reviewer when the PR is created (used in Step 6)
+   - `--finalize`: automatically continue into the `git-pr-finalize` flow after PR creation (used in Step 7)
+   - If neither flag is present, behavior is unchanged (backward compatible)
 1. Get the current branch with `git branch --show-current`
 2. Determine `<base>` (first matching rule wins):
    - If the current branch starts with `hotfix/` → `<base>` = `main`
@@ -115,6 +120,7 @@ From the diff file list in `git diff <base>...HEAD --name-only`, detect changes 
    ```
 
 3. Create the PR with `gh pr create --base <base> --title "..." --body "..."`
+   - If `--copilot-review` was specified, add `--reviewer @copilot` (uses `gh` v2.88.0+'s native Copilot reviewer support)
    - Use a heredoc for the body to preserve formatting:
 
      ```bash
@@ -140,3 +146,5 @@ PR #XX: <title>
 - Files changed: X
 - Lines changed: +XX / -XX
 ```
+
+If `--finalize` was specified, continue directly into the `git-pr-finalize` flow for the newly created PR number (equivalent to running `/git-pr-finalize <PR number>`). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged — this flag only chains the flow, it does not skip that confirmation.
