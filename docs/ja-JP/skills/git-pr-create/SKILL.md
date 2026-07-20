@@ -18,6 +18,7 @@ argument-hint: "[--copilot-review] [--finalize]"
    - `--copilot-review`: PR作成時にCopilotをレビュアーとして指定する(Step 6で使用)
    - `--finalize`: PR作成後、続けて `git-pr-finalize` のフローに接続する(Step 7で使用)
    - どちらのフラグも指定されない場合、挙動は従来通り変わらない(後方互換)
+   - 続行する前に、検出したフラグを明示的に述べる(例: 「フラグ: --copilot-review=no, --finalize=yes」)。`$ARGUMENTS` 内で指定が確認できたフラグのみをStep 6/Step 7で有効なものとして扱う — `--reviewer @copilot` の付与や `git-pr-finalize` への接続をデフォルトで行わない
 1. `git branch --show-current` で現在のブランチを取得する
 2. `<base>` を決定する（最初に一致したルールを採用）:
    - 現在のブランチが `hotfix/` で始まる → `<base>` = `main`

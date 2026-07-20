@@ -18,6 +18,7 @@ Resolve the base branch first so the rest of the flow works for `main`-only repo
    - `--copilot-review`: request Copilot as a reviewer when the PR is created (used in Step 6)
    - `--finalize`: automatically continue into the `git-pr-finalize` flow after PR creation (used in Step 7)
    - If neither flag is present, behavior is unchanged (backward compatible)
+   - State explicitly which flags were detected (e.g. "Flags: --copilot-review=no, --finalize=yes") before continuing, and treat only a flag confirmed present in `$ARGUMENTS` as active in Step 6 / Step 7 — never add `--reviewer @copilot` or chain into `git-pr-finalize` by default
 1. Get the current branch with `git branch --show-current`
 2. Determine `<base>` (first matching rule wins):
    - If the current branch starts with `hotfix/` → `<base>` = `main`
