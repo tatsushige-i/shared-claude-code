@@ -1,6 +1,7 @@
 ---
 name: git-pr-create
 description: Create a GitHub PR from the current branch - analyze changes, check size limits, and generate PR with proper formatting
+argument-hint: "[--copilot-review] [--finalize]"
 ---
 
 # Create PR Skill
@@ -9,12 +10,17 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 ## Steps
 
-### Step 0: Resolve Base Branch
+### Step 0: Parse Flags and Resolve Base Branch
 
 Resolve the base branch first so the rest of the flow works for `main`-only repositories (backward compatible), `main` + `develop` (git-flow lite) repositories, and repositories with `release/*` branches (standard Git Flow). Use the resolved value wherever `<base>` appears below.
 
-1. Get the current branch with `git branch --show-current`
-2. Determine `<base>` (first matching rule wins):
+1. Parse `$ARGUMENTS` for optional flags (can be combined, order-independent):
+   - `--copilot-review`: request Copilot as a reviewer when the PR is created (used in Step 6)
+   - `--finalize`: automatically continue into the `git-pr-finalize` flow after PR creation (used in Step 7)
+   - If neither flag is present, behavior is unchanged (backward compatible)
+   - State explicitly which flags were detected (e.g. "Flags: --copilot-review=no, --finalize=yes") before continuing, and treat only a flag confirmed present in `$ARGUMENTS` as active in Step 6 / Step 7 — never add `--reviewer @copilot` or chain into `git-pr-finalize` by default
+2. Get the current branch with `git branch --show-current`
+3. Determine `<base>` (first matching rule wins):
    - If the current branch starts with `hotfix/` → `<base>` = `main`
    - Else, detect a `release/*` branch the current branch was cut from: list release branches with `git ls-remote --heads origin 'release/*'`. If any exist, run `git fetch origin` (so their tips are available locally), then for each release branch `R` test `git merge-base --is-ancestor origin/<R> HEAD`. Among the release branches that are ancestors of `HEAD` (the current branch was cut from them), pick the one whose merge-base with `HEAD` is the most recent (the closest ancestor) → `<base>` = that release branch
    - Else → run `git ls-remote --heads origin develop`; if `develop` exists → `<base>` = `develop`, else → `<base>` = `main`
@@ -115,6 +121,7 @@ From the diff file list in `git diff <base>...HEAD --name-only`, detect changes 
    ```
 
 3. Create the PR with `gh pr create --base <base> --title "..." --body "..."`
+   - If `--copilot-review` was specified, add `--reviewer @copilot` (uses `gh` v2.88.0+'s native Copilot reviewer support)
    - Use a heredoc for the body to preserve formatting:
 
      ```bash
@@ -140,3 +147,5 @@ PR #XX: <title>
 - Files changed: X
 - Lines changed: +XX / -XX
 ```
+
+If `--finalize` was specified, continue directly into the `git-pr-finalize` flow (run it with no arguments — it resolves the PR from the current branch). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged — this flag only chains the flow, it does not skip that confirmation.
