@@ -14,13 +14,13 @@ Automate the workflow for creating a GitHub PR from the current branch. Performs
 
 Resolve the base branch first so the rest of the flow works for `main`-only repositories (backward compatible), `main` + `develop` (git-flow lite) repositories, and repositories with `release/*` branches (standard Git Flow). Use the resolved value wherever `<base>` appears below.
 
-0. Parse `$ARGUMENTS` for optional flags (can be combined, order-independent):
+1. Parse `$ARGUMENTS` for optional flags (can be combined, order-independent):
    - `--copilot-review`: request Copilot as a reviewer when the PR is created (used in Step 6)
    - `--finalize`: automatically continue into the `git-pr-finalize` flow after PR creation (used in Step 7)
    - If neither flag is present, behavior is unchanged (backward compatible)
    - State explicitly which flags were detected (e.g. "Flags: --copilot-review=no, --finalize=yes") before continuing, and treat only a flag confirmed present in `$ARGUMENTS` as active in Step 6 / Step 7 — never add `--reviewer @copilot` or chain into `git-pr-finalize` by default
-1. Get the current branch with `git branch --show-current`
-2. Determine `<base>` (first matching rule wins):
+2. Get the current branch with `git branch --show-current`
+3. Determine `<base>` (first matching rule wins):
    - If the current branch starts with `hotfix/` → `<base>` = `main`
    - Else, detect a `release/*` branch the current branch was cut from: list release branches with `git ls-remote --heads origin 'release/*'`. If any exist, run `git fetch origin` (so their tips are available locally), then for each release branch `R` test `git merge-base --is-ancestor origin/<R> HEAD`. Among the release branches that are ancestors of `HEAD` (the current branch was cut from them), pick the one whose merge-base with `HEAD` is the most recent (the closest ancestor) → `<base>` = that release branch
    - Else → run `git ls-remote --heads origin develop`; if `develop` exists → `<base>` = `develop`, else → `<base>` = `main`
@@ -148,4 +148,4 @@ PR #XX: <title>
 - Lines changed: +XX / -XX
 ```
 
-If `--finalize` was specified, continue directly into the `git-pr-finalize` flow for the newly created PR number (equivalent to running `/git-pr-finalize <PR number>`). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged — this flag only chains the flow, it does not skip that confirmation.
+If `--finalize` was specified, continue directly into the `git-pr-finalize` flow (run it with no arguments — it resolves the PR from the current branch). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged — this flag only chains the flow, it does not skip that confirmation.

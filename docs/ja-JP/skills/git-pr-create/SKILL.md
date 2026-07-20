@@ -10,17 +10,17 @@ argument-hint: "[--copilot-review] [--finalize]"
 
 ## 処理手順
 
-### Step 0: フラグ解析とbaseブランチの解決
+### Step 0: フラグ解析と base ブランチの解決
 
 以降の処理が `main` のみのリポジトリ（後方互換）でも、`main` + `develop`（git-flow ライト）のリポジトリでも、`release/*` ブランチを持つリポジトリ（標準 Git Flow）でも動作するよう、最初に base ブランチを解決する。以降の `<base>` には解決した値を使用する。
 
-0. `$ARGUMENTS` から任意フラグを解析する(併用可・順不同):
+1. `$ARGUMENTS` から任意フラグを解析する(併用可・順不同):
    - `--copilot-review`: PR作成時にCopilotをレビュアーとして指定する(Step 6で使用)
    - `--finalize`: PR作成後、続けて `git-pr-finalize` のフローに接続する(Step 7で使用)
    - どちらのフラグも指定されない場合、挙動は従来通り変わらない(後方互換)
    - 続行する前に、検出したフラグを明示的に述べる(例: 「フラグ: --copilot-review=no, --finalize=yes」)。`$ARGUMENTS` 内で指定が確認できたフラグのみをStep 6/Step 7で有効なものとして扱う — `--reviewer @copilot` の付与や `git-pr-finalize` への接続をデフォルトで行わない
-1. `git branch --show-current` で現在のブランチを取得する
-2. `<base>` を決定する（最初に一致したルールを採用）:
+2. `git branch --show-current` で現在のブランチを取得する
+3. `<base>` を決定する（最初に一致したルールを採用）:
    - 現在のブランチが `hotfix/` で始まる → `<base>` = `main`
    - それ以外 → 現在のブランチの派生元 `release/*` ブランチを検出する: `git ls-remote --heads origin 'release/*'` で release ブランチを列挙する。存在する場合は `git fetch origin` を実行（tip をローカルに取得）してから、各 release ブランチ `R` について `git merge-base --is-ancestor origin/<R> HEAD` を判定する。`HEAD` の祖先である（現在のブランチがそこから切られた）release ブランチのうち、`HEAD` との分岐点が最も新しい（最も近い祖先）ものを `<base>` = その release ブランチとする
    - それ以外 → `git ls-remote --heads origin develop` を実行し、`develop` があれば `<base>` = `develop`、なければ `<base>` = `main`
@@ -148,4 +148,4 @@ PR #XX: <タイトル>
 - 変更行数: +XX / -XX
 ```
 
-`--finalize` が指定されている場合、作成したPR番号で `git-pr-finalize` のフローへ続けて接続する(`/git-pr-finalize <PR番号>` を実行するのと同等)。`git-pr-finalize` Step 6 のマージ前ユーザー確認ゲートは変更しない — このフラグはフローを連結するだけで、確認をスキップしない。
+`--finalize` が指定されている場合、続けて `git-pr-finalize` のフローに接続する(引数なしで実行する — 現在のブランチからPRが解決される)。`git-pr-finalize` Step 6 のマージ前ユーザー確認ゲートは変更しない — このフラグはフローを連結するだけで、確認をスキップしない。
