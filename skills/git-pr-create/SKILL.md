@@ -148,4 +148,8 @@ PR #XX: <title>
 - Lines changed: +XX / -XX
 ```
 
-If `--finalize` was specified, continue directly into the `git-pr-finalize` flow (run it with no arguments — it resolves the PR from the current branch). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged — this flag only chains the flow, it does not skip that confirmation.
+### Step 8: Chain to Finalize (if requested)
+
+If `--finalize` was specified in Step 0, run the `git-pr-finalize` skill now, in the same turn — do not merely state the intention to continue; actually invoke it (no arguments — it resolves the PR from the current branch). The merge confirmation gate in `git-pr-finalize` Step 6 is unchanged: this flag only chains the flow, it does not skip that confirmation.
+
+If `--finalize` was not specified, skip this step.
