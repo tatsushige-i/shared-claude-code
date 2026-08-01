@@ -28,7 +28,8 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 agents/                 # マスター subagent 定義（単一 .md ファイル） — シンボリックリンクで消費リポジトリに配布
 ├── README.md           # エージェント一覧テーブル
 ├── impl-*.md           # Issue 実装パイプラインのエージェント（planner / coder / tester）
-└── review-*.md         # 並列コードレビューチーム（正確性 / セキュリティ / 設計 / 可読性 / テスト）
+├── review-*.md         # 並列コードレビューチーム（正確性 / セキュリティ / 設計 / 可読性 / テスト）
+└── tech-debt-auditor.md # tech-debt-audit-* スキルが利用する汎用の技術的負債カテゴリ監査エージェント
 hooks/                  # 共通hooks定義 — config-claude-sync で消費リポジトリの settings.json にマージ
 └── shared-hooks.json   # PreToolUse / Stop / UserPromptSubmit 等の共通hooks
 ci-templates/           # 言語別CI/設定テンプレート — ファイルコピーで消費リポジトリに配布
@@ -82,6 +83,7 @@ ln -s ../../../../shared-claude-code/agents/review-security.md .claude/agents/sh
 ln -s ../../../../shared-claude-code/agents/review-design.md .claude/agents/shared/review-design.md
 ln -s ../../../../shared-claude-code/agents/review-readability.md .claude/agents/shared/review-readability.md
 ln -s ../../../../shared-claude-code/agents/review-tests.md .claude/agents/shared/review-tests.md
+ln -s ../../../../shared-claude-code/agents/tech-debt-auditor.md .claude/agents/shared/tech-debt-auditor.md
 ```
 
 または `/config-claude-sync` スキルを使って、不足しているシンボリックリンクを自動検出・作成できる。
