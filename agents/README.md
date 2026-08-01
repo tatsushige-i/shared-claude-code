@@ -14,3 +14,4 @@ In consuming repositories, shared agents are symlinked under `.claude/agents/sha
 | `impl-planner` | Read-only implementation planner (opus) — lays out affected files, steps, and decision points from an Issue. Used by the `impl-pipeline` skill. |
 | `impl-coder` | Autonomous implementer (sonnet) — executes a confirmed plan for mechanical Issues. Used by the `impl-pipeline` skill. |
 | `impl-tester` | Test author (sonnet) — writes and runs tests from the spec, not the implementation. Used by the `impl-pipeline` skill. |
+| `tech-debt-auditor` | Generic tech-debt category auditor (sonnet) — investigates one category using instructions and project context supplied in the invocation prompt, returns structured findings. Used by `tech-debt-audit-nextjs` (and a future `tech-debt-audit-flutter`). |

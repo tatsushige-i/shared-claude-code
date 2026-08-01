@@ -28,7 +28,8 @@ skills/                 # Master skill definitions — symlinked into consuming 
 agents/                 # Master subagent definitions (single .md files) — symlinked into consuming repos
 ├── README.md           # Agents index table
 ├── impl-*.md           # Issue implementation pipeline agents (planner / coder / tester)
-└── review-*.md         # Parallel code-review team (correctness / security / design / readability / tests)
+├── review-*.md         # Parallel code-review team (correctness / security / design / readability / tests)
+└── tech-debt-auditor.md # Generic tech-debt category auditor, used by tech-debt-audit-* skills
 hooks/                  # Shared hook definitions — merged into consuming repos' settings.json via config-claude-sync
 └── shared-hooks.json   # Shared hooks for PreToolUse / Stop / UserPromptSubmit / etc.
 ci-templates/           # CI/config templates by language — copied to consuming repos
@@ -83,6 +84,7 @@ ln -s ../../../../shared-claude-code/agents/review-security.md .claude/agents/sh
 ln -s ../../../../shared-claude-code/agents/review-design.md .claude/agents/shared/review-design.md
 ln -s ../../../../shared-claude-code/agents/review-readability.md .claude/agents/shared/review-readability.md
 ln -s ../../../../shared-claude-code/agents/review-tests.md .claude/agents/shared/review-tests.md
+ln -s ../../../../shared-claude-code/agents/tech-debt-auditor.md .claude/agents/shared/tech-debt-auditor.md
 ```
 
 Or use the `/config-claude-sync` skill to detect missing symlinks and create them automatically.
