@@ -176,12 +176,14 @@ CI チェックと Copilot レビューを同時に監視する。**両方**が�
    - CI: all passing
    - Review threads: all resolved
    - Base: <baseRefName>
+   - Merge method: <merge commit | squash>
 
    Merge this PR? (the head branch will be deleted)
    ```
 
-2. 承認後、`gh pr merge <PR number> --delete-branch` でマージする。
-   - マージ方式はリポジトリ設定に従う（設定された squash/merge/rebase など）。ユーザーが指定しない限り方式を強制しない。
+2. 承認後、PR の `baseRefName`（Step 2 で取得済み）に応じたマージ方式で実行する。
+   - `baseRefName == main` → `gh pr merge <PR number> --merge --delete-branch`
+   - それ以外（`develop`, `release/*` など） → `gh pr merge <PR number> --squash --delete-branch`
    - `--delete-branch` でリモートの head ブランチを削除する。base（`main`/`develop`）は決して削除しない。
 3. マージが失敗した場合（マージ不可、ブランチ保護など）、エラーを表示して停止する。
 

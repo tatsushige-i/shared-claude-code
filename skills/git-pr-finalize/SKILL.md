@@ -176,12 +176,14 @@ Merging is a destructive, outward-facing action. **Always confirm with the user 
    - CI: all passing
    - Review threads: all resolved
    - Base: <baseRefName>
+   - Merge method: <merge commit | squash>
 
    Merge this PR? (the head branch will be deleted)
    ```
 
-2. After approval, merge with `gh pr merge <PR number> --delete-branch`.
-   - The merge method follows the repository's settings (e.g., squash/merge/rebase as configured). Do not force a method unless the user specifies one.
+2. After approval, merge using the method determined by the PR's `baseRefName` (fetched in Step 2):
+   - `baseRefName == main` → `gh pr merge <PR number> --merge --delete-branch`
+   - otherwise (e.g., `develop`, `release/*`) → `gh pr merge <PR number> --squash --delete-branch`
    - `--delete-branch` removes the remote head branch. The base (`main`/`develop`) is never deleted.
 3. If the merge fails (e.g., not mergeable, branch protection), display the error and stop.
 
