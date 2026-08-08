@@ -23,7 +23,6 @@ skills/                 # マスタースキル定義 — シンボリックリ�
 ├── git-review-respond/ # PRレビューコメントへの対応
 ├── impl-pipeline/      # 支援エージェント群（plan/code/test）で Issue 実装を進める
 ├── review-team-run/    # PR作成前の差分にレビューチームを並列起動
-├── tech-debt-audit-flutter/ # Flutter / Dartプロジェクトの技術的負債調査
 └── tech-debt-audit-nextjs/ # Next.jsプロジェクトの技術的負債調査
 agents/                 # マスター subagent 定義（単一 .md ファイル） — シンボリックリンクで消費リポジトリに配布
 ├── README.md           # エージェント一覧テーブル
@@ -71,7 +70,6 @@ ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-f
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/impl-pipeline .claude/skills/impl-pipeline
 ln -s ../../../shared-claude-code/skills/review-team-run .claude/skills/review-team-run
-ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 
 # エージェント（.claude/agents/shared/ 配下にシンボリックリンク）
@@ -110,5 +108,4 @@ ln -s ../../../../shared-claude-code/agents/tech-debt-auditor.md .claude/agents/
 | `git-review-respond` | `/git-review-respond <PR#>` | レビューコメント分析・コード修正・返信 |
 | `impl-pipeline` | `/impl-pipeline <Issue#>` | 支援エージェント群（plan/code/test）で Issue 実装を進め、人間ゲートで機械的 vs. 対話を切り分け、review-team-run を再利用し、git-pr-create へ引き継ぐ |
 | `review-team-run` | `/review-team-run` | スタンスの異なるレビュー subagent を PR作成前の差分に並列起動し、統合レポートを提示 |
-| `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Flutter / Dartプロジェクトの技術的負債調査・優先度付きレポート生成 |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Next.js（App Router）プロジェクトの技術的負債調査・優先度付きレポート生成 |
