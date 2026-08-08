@@ -23,7 +23,6 @@ skills/                 # Master skill definitions — symlinked into consuming 
 ├── git-review-respond/ # Respond to PR review comments
 ├── impl-pipeline/      # Drive Issue implementation with support agents (plan/code/test)
 ├── review-team-run/    # Run a parallel review team over the pre-PR diff
-├── tech-debt-audit-flutter/ # Audit technical debt in Flutter / Dart projects
 └── tech-debt-audit-nextjs/ # Audit technical debt in Next.js projects
 agents/                 # Master subagent definitions (single .md files) — symlinked into consuming repos
 ├── README.md           # Agents index table
@@ -72,7 +71,6 @@ ln -s ../../../shared-claude-code/skills/git-pr-finalize .claude/skills/git-pr-f
 ln -s ../../../shared-claude-code/skills/git-review-respond .claude/skills/git-review-respond
 ln -s ../../../shared-claude-code/skills/impl-pipeline .claude/skills/impl-pipeline
 ln -s ../../../shared-claude-code/skills/review-team-run .claude/skills/review-team-run
-ln -s ../../../shared-claude-code/skills/tech-debt-audit-flutter .claude/skills/tech-debt-audit-flutter
 ln -s ../../../shared-claude-code/skills/tech-debt-audit-nextjs .claude/skills/tech-debt-audit-nextjs
 
 # Agents (symlinked under .claude/agents/shared/)
@@ -111,5 +109,4 @@ The shared workflows include `close-linked-issues-on-develop.yml`, which automat
 | `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
 | `impl-pipeline` | `/impl-pipeline <Issue#>` | Drive Issue implementation with support agents (plan/code/test), split mechanical vs. interactive at a human gate, reuse review-team-run, and hand off to git-pr-create |
 | `review-team-run` | `/review-team-run` | Run a parallel team of stance-distinct review subagents over the pre-PR diff and present a consolidated report |
-| `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Audit technical debt in Flutter / Dart projects with prioritized report |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Audit technical debt in Next.js (App Router) projects with prioritized report |

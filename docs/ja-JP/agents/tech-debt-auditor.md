@@ -1,6 +1,6 @@
 ---
 name: tech-debt-auditor
-description: 汎用の技術的負債カテゴリ監査エージェント — 呼び出しプロンプトで渡されたカテゴリ・調査指示・プロジェクトコンテキストをもとに1カテゴリを調査し、構造化された findings を返す。複数の監査スキルで再利用可能（tech-debt-audit-nextjs で使用、将来の tech-debt-audit-flutter でも利用予定）。カテゴリごとに1インスタンスを並列起動する。
+description: 汎用の技術的負債カテゴリ監査エージェント — 呼び出しプロンプトで渡されたカテゴリ・調査指示・プロジェクトコンテキストをもとに1カテゴリを調査し、構造化された findings を返す。複数の監査スキルで再利用可能（本リポの tech-debt-audit-nextjs で使用、shared-flutter-ios の tech-debt-audit-flutter でも使用）。カテゴリごとに1インスタンスを並列起動する。
 tools: Read, Grep, Glob
 model: sonnet
 ---

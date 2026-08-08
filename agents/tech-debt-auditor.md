@@ -1,6 +1,6 @@
 ---
 name: tech-debt-auditor
-description: Generic technical-debt category auditor — investigates one assigned category using instructions and project context supplied in the invocation prompt, and returns structured findings. Reusable across audit skills (used by tech-debt-audit-nextjs; intended for a future tech-debt-audit-flutter). Launch one instance per category, in parallel.
+description: Generic technical-debt category auditor — investigates one assigned category using instructions and project context supplied in the invocation prompt, and returns structured findings. Reusable across audit skills (used by tech-debt-audit-nextjs here, and by tech-debt-audit-flutter in shared-flutter-ios). Launch one instance per category, in parallel.
 tools: Read, Grep, Glob
 model: sonnet
 ---

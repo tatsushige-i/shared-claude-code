@@ -14,5 +14,4 @@ Shared skills distributed to consuming repositories via symlinks. Each skill is 
 | `git-review-respond` | `/git-review-respond <PR#>` | Analyze review comments, fix code, reply |
 | `impl-pipeline` | `/impl-pipeline <Issue#>` | Drive Issue implementation with support agents (plan/code/test), split mechanical vs. interactive at a human gate, reuse review-team-run, and hand off to git-pr-create |
 | `review-team-run` | `/review-team-run` | Run a parallel team of stance-distinct review subagents over the pre-PR diff and present a consolidated report |
-| `tech-debt-audit-flutter` | `/tech-debt-audit-flutter` | Audit technical debt in Flutter / Dart projects with prioritized report |
 | `tech-debt-audit-nextjs` | `/tech-debt-audit-nextjs` | Audit technical debt in Next.js (App Router) projects with prioritized report |
